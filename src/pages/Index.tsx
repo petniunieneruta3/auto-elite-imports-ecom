@@ -6,6 +6,7 @@ import FeaturedVehicles from '@/components/FeaturedVehicles';
 import TestimonialSection from '@/components/TestimonialSection';
 import AdvantagesSection from '@/components/AdvantagesSection';
 import Footer from '@/components/Footer';
+import LanguageSelector from '@/components/LanguageSelector';
 
 const Index = () => {
   return (
@@ -18,6 +19,7 @@ const Index = () => {
         <AdvantagesSection />
       </main>
       <Footer />
+      <LanguageSelector />
     </div>
   );
 };

@@ -1,16 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
-declare global {
-  interface Window {
-    google: any;
-    googleTranslateElementInit: () => void;
-  }
-}
 
 const Header = () => {
   const navigate = useNavigate();
@@ -24,102 +17,18 @@ const Header = () => {
     { name: 'Sendungsverfolgung', path: '/tracking' },
   ];
 
-  useEffect(() => {
-    // Add CSS styles for Google Translate
-    const style = document.createElement('style');
-    style.textContent = `
-      /* Style Google Translate widget */
-      .google-translate-container .goog-te-gadget {
-        font-family: inherit !important;
-        font-size: 0 !important;
-      }
-      
-      .google-translate-container .goog-te-gadget-simple {
-        background-color: transparent !important;
-        border: none !important;
-        font-size: 14px !important;
-        display: inline-block !important;
-        padding: 0 !important;
-      }
-      
-      .google-translate-container .goog-te-gadget-simple .goog-te-menu-value {
-        color: #6B7280 !important;
-        font-family: inherit !important;
-      }
-      
-      .google-translate-container .goog-te-gadget-simple .goog-te-menu-value:hover {
-        color: #111827 !important;
-      }
-      
-      .google-translate-container .goog-te-gadget-icon {
-        display: none !important;
-      }
-      
-      .google-translate-container .goog-te-gadget-simple .goog-te-menu-value span {
-        color: inherit !important;
-      }
-      
-      /* Hide Google Translate banner */
-      .goog-te-banner-frame {
-        display: none !important;
-      }
-      
-      body {
-        top: 0 !important;
-      }
-      
-      .skiptranslate iframe {
-        visibility: hidden !important;
-      }
-      
-      body.translated-ltr {
-        top: 0 !important;
-      }
-      
-      .goog-te-balloon-frame {
-        display: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Load Google Translate script
-    const script = document.createElement('script');
-    script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-    script.async = true;
-    document.head.appendChild(script);
-
-    // Initialize Google Translate
-    window.googleTranslateElementInit = () => {
-      new window.google.translate.TranslateElement(
-        {
-          pageLanguage: 'de',
-          includedLanguages: 'de,en,fr,es,it,ru,pl,nl,pt,ar',
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          autoDisplay: false,
-        },
-        'google_translate_element'
-      );
-    };
-
-    return () => {
-      // Cleanup
-      const existingScript = document.querySelector('script[src*="translate.google.com"]');
-      if (existingScript) {
-        existingScript.remove();
-      }
-      if (style.parentNode) {
-        style.parentNode.removeChild(style);
-      }
-    };
-  }, []);
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-luxury-light-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
-            <div className="text-2xl md:text-3xl font-bold text-luxury-black">
+            <img 
+              src="/lovable-uploads/3b45e4fd-7297-4980-8b0c-fef51b923a4d.png" 
+              alt="AUTO IMPORT EXPORT Logo" 
+              className="h-10 md:h-12 w-auto mr-3"
+            />
+            <div className="text-xl md:text-2xl font-bold text-luxury-black">
               AUTO
               <span className="text-luxury-gold"> IMPORT </span>
               EXPORT
@@ -149,9 +58,6 @@ const Header = () => {
             >
               <Search className="h-5 w-5 text-luxury-gray" />
             </Button>
-
-            {/* Google Translate */}
-            <div id="google_translate_element" className="google-translate-container"></div>
 
             {/* Cart */}
             <Button 
@@ -204,10 +110,6 @@ const Header = () => {
                   {item.name}
                 </button>
               ))}
-              {/* Google Translate for mobile */}
-              <div className="px-4 py-2">
-                <div id="google_translate_element_mobile" className="google-translate-container"></div>
-              </div>
             </nav>
           </div>
         )}
