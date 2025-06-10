@@ -25,6 +25,63 @@ const Header = () => {
   ];
 
   useEffect(() => {
+    // Add CSS styles for Google Translate
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Style Google Translate widget */
+      .google-translate-container .goog-te-gadget {
+        font-family: inherit !important;
+        font-size: 0 !important;
+      }
+      
+      .google-translate-container .goog-te-gadget-simple {
+        background-color: transparent !important;
+        border: none !important;
+        font-size: 14px !important;
+        display: inline-block !important;
+        padding: 0 !important;
+      }
+      
+      .google-translate-container .goog-te-gadget-simple .goog-te-menu-value {
+        color: #6B7280 !important;
+        font-family: inherit !important;
+      }
+      
+      .google-translate-container .goog-te-gadget-simple .goog-te-menu-value:hover {
+        color: #111827 !important;
+      }
+      
+      .google-translate-container .goog-te-gadget-icon {
+        display: none !important;
+      }
+      
+      .google-translate-container .goog-te-gadget-simple .goog-te-menu-value span {
+        color: inherit !important;
+      }
+      
+      /* Hide Google Translate banner */
+      .goog-te-banner-frame {
+        display: none !important;
+      }
+      
+      body {
+        top: 0 !important;
+      }
+      
+      .skiptranslate iframe {
+        visibility: hidden !important;
+      }
+      
+      body.translated-ltr {
+        top: 0 !important;
+      }
+      
+      .goog-te-balloon-frame {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
     // Load Google Translate script
     const script = document.createElement('script');
     script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
@@ -49,6 +106,9 @@ const Header = () => {
       const existingScript = document.querySelector('script[src*="translate.google.com"]');
       if (existingScript) {
         existingScript.remove();
+      }
+      if (style.parentNode) {
+        style.parentNode.removeChild(style);
       }
     };
   }, []);
@@ -152,60 +212,6 @@ const Header = () => {
           </div>
         )}
       </div>
-
-      <style jsx global>{`
-        /* Style Google Translate widget */
-        .google-translate-container .goog-te-gadget {
-          font-family: inherit !important;
-          font-size: 0 !important;
-        }
-        
-        .google-translate-container .goog-te-gadget-simple {
-          background-color: transparent !important;
-          border: none !important;
-          font-size: 14px !important;
-          display: inline-block !important;
-          padding: 0 !important;
-        }
-        
-        .google-translate-container .goog-te-gadget-simple .goog-te-menu-value {
-          color: #6B7280 !important;
-          font-family: inherit !important;
-        }
-        
-        .google-translate-container .goog-te-gadget-simple .goog-te-menu-value:hover {
-          color: #111827 !important;
-        }
-        
-        .google-translate-container .goog-te-gadget-icon {
-          display: none !important;
-        }
-        
-        .google-translate-container .goog-te-gadget-simple .goog-te-menu-value span {
-          color: inherit !important;
-        }
-        
-        /* Hide Google Translate banner */
-        .goog-te-banner-frame {
-          display: none !important;
-        }
-        
-        body {
-          top: 0 !important;
-        }
-        
-        .skiptranslate iframe {
-          visibility: hidden !important;
-        }
-        
-        body.translated-ltr {
-          top: 0 !important;
-        }
-        
-        .goog-te-balloon-frame {
-          display: none !important;
-        }
-      `}</style>
     </header>
   );
 };
