@@ -24,11 +24,11 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
             <img 
-              src="/lovable-uploads/3b45e4fd-7297-4980-8b0c-fef51b923a4d.png" 
+              src="/lovable-uploads/4ebde816-7461-4e11-b738-b99937447b3e.png" 
               alt="AUTO IMPORT EXPORT Logo" 
-              className="h-10 md:h-12 w-auto mr-3"
+              className="h-8 md:h-10 w-auto mr-3"
             />
-            <div className="text-xl md:text-2xl font-bold text-luxury-black">
+            <div className="text-lg md:text-xl font-bold text-luxury-black">
               AUTO
               <span className="text-luxury-gold"> IMPORT </span>
               EXPORT
