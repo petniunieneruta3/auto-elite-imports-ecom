@@ -37,13 +37,13 @@
 
     --radius: 0.5rem;
 
-    /* Premium color palette inspired by luxury automotive brands */
+    /* Premium color palette inspired by luxury automotive brands - updated with sky blue */
     --luxury-black: 0 0% 8%;
     --luxury-dark-gray: 0 0% 15%;
     --luxury-gray: 0 0% 30%;
     --luxury-light-gray: 0 0% 85%;
-    --luxury-gold: 45 100% 70%;
-    --luxury-dark-gold: 45 100% 50%;
+    --luxury-gold: 200 100% 60%;
+    --luxury-dark-gold: 200 100% 45%;
     --luxury-white: 0 0% 98%;
   }
 
