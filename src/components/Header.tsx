@@ -1,28 +1,20 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, Globe } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
+declare global {
+  interface Window {
+    google: any;
+    googleTranslateElementInit: () => void;
+  }
+}
 
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('DE');
-
-  const languages = [
-    { code: 'DE', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'FR', name: 'Français', flag: '🇫🇷' },
-    { code: 'EN', name: 'English', flag: '🇬🇧' },
-    { code: 'ES', name: 'Español', flag: '🇪🇸' },
-    { code: 'IT', name: 'Italiano', flag: '🇮🇹' },
-  ];
 
   const menuItems = [
     { name: 'Katalog', path: '/catalog' },
@@ -31,6 +23,35 @@ const Header = () => {
     { name: 'Kontakt', path: '/contact' },
     { name: 'Sendungsverfolgung', path: '/tracking' },
   ];
+
+  useEffect(() => {
+    // Load Google Translate script
+    const script = document.createElement('script');
+    script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    script.async = true;
+    document.head.appendChild(script);
+
+    // Initialize Google Translate
+    window.googleTranslateElementInit = () => {
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: 'de',
+          includedLanguages: 'de,en,fr,es,it,ru,pl,nl,pt,ar',
+          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false,
+        },
+        'google_translate_element'
+      );
+    };
+
+    return () => {
+      // Cleanup
+      const existingScript = document.querySelector('script[src*="translate.google.com"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-luxury-light-gray">
@@ -69,27 +90,8 @@ const Header = () => {
               <Search className="h-5 w-5 text-luxury-gray" />
             </Button>
 
-            {/* Language Selector */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="hover:bg-luxury-light-gray">
-                  <Globe className="h-4 w-4 mr-2" />
-                  {currentLanguage}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {languages.map((lang) => (
-                  <DropdownMenuItem 
-                    key={lang.code}
-                    onClick={() => setCurrentLanguage(lang.code)}
-                    className="cursor-pointer"
-                  >
-                    <span className="mr-2">{lang.flag}</span>
-                    {lang.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Google Translate */}
+            <div id="google_translate_element" className="google-translate-container"></div>
 
             {/* Cart */}
             <Button 
@@ -142,10 +144,68 @@ const Header = () => {
                   {item.name}
                 </button>
               ))}
+              {/* Google Translate for mobile */}
+              <div className="px-4 py-2">
+                <div id="google_translate_element_mobile" className="google-translate-container"></div>
+              </div>
             </nav>
           </div>
         )}
       </div>
+
+      <style jsx global>{`
+        /* Style Google Translate widget */
+        .google-translate-container .goog-te-gadget {
+          font-family: inherit !important;
+          font-size: 0 !important;
+        }
+        
+        .google-translate-container .goog-te-gadget-simple {
+          background-color: transparent !important;
+          border: none !important;
+          font-size: 14px !important;
+          display: inline-block !important;
+          padding: 0 !important;
+        }
+        
+        .google-translate-container .goog-te-gadget-simple .goog-te-menu-value {
+          color: #6B7280 !important;
+          font-family: inherit !important;
+        }
+        
+        .google-translate-container .goog-te-gadget-simple .goog-te-menu-value:hover {
+          color: #111827 !important;
+        }
+        
+        .google-translate-container .goog-te-gadget-icon {
+          display: none !important;
+        }
+        
+        .google-translate-container .goog-te-gadget-simple .goog-te-menu-value span {
+          color: inherit !important;
+        }
+        
+        /* Hide Google Translate banner */
+        .goog-te-banner-frame {
+          display: none !important;
+        }
+        
+        body {
+          top: 0 !important;
+        }
+        
+        .skiptranslate iframe {
+          visibility: hidden !important;
+        }
+        
+        body.translated-ltr {
+          top: 0 !important;
+        }
+        
+        .goog-te-balloon-frame {
+          display: none !important;
+        }
+      `}</style>
     </header>
   );
 };
