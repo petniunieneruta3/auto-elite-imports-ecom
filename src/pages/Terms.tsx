@@ -94,17 +94,6 @@ const Terms = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>§7 Gerichtsstand und anwendbares Recht</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p>Gerichtsstand ist Rotterdam, Niederlande.</p>
-                  <p>Es gilt niederländisches Recht unter Ausschluss des UN-Kaufrechts.</p>
-                  <p>Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
                   <CardTitle>Kontakt</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">

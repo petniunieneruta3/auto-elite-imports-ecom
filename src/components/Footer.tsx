@@ -130,8 +130,6 @@ const Footer = () => {
             © 2024 AUTO IMPORT EXPORT. Alle Rechte vorbehalten.
           </div>
           <div className="flex space-x-4 mt-4 md:mt-0 text-sm text-gray-300">
-            <span>Gerichtsstand: Rotterdam</span>
-            <span>•</span>
             <span>USt-IdNr: DE123456789</span>
           </div>
         </div>

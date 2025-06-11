@@ -12,9 +12,12 @@ import { Calculator, CreditCard, TrendingUp, Shield, CheckCircle } from 'lucide-
 const Financing = () => {
   const [loanAmount, setLoanAmount] = useState(50000);
   const [loanTerm, setLoanTerm] = useState(60);
-  const [interestRate] = useState(3.9);
+  const [interestRate] = useState(0);
 
   const calculateMonthlyPayment = () => {
+    if (interestRate === 0) {
+      return (loanAmount / loanTerm).toFixed(2);
+    }
     const monthlyRate = interestRate / 100 / 12;
     const numPayments = loanTerm;
     const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
@@ -26,7 +29,7 @@ const Financing = () => {
     {
       icon: <CreditCard className="h-8 w-8 text-luxury-gold" />,
       title: "Klassischer Autokredit",
-      description: "Günstige Zinsen ab 2,9% p.a.",
+      description: "0% Zinsen für alle Kunden",
       features: ["Laufzeit: 12-84 Monate", "Anzahlung ab 10%", "Schnelle Bearbeitung"]
     },
     {
@@ -39,7 +42,7 @@ const Financing = () => {
       icon: <Shield className="h-8 w-8 text-luxury-gold" />,
       title: "Ratenkauf",
       description: "Bequeme Ratenzahlung ohne Zinsen",
-      features: ["0% Zinsen bis 24 Monate", "Flexible Raten", "Keine Anzahlung"]
+      features: ["0% Zinsen bis 84 Monate", "Flexible Raten", "Keine Anzahlung"]
     }
   ];
 
@@ -117,7 +120,7 @@ const Financing = () => {
                       className="bg-gray-100"
                     />
                     <p className="text-xs text-luxury-gray mt-1">
-                      Beispielzinssatz - individuell verhandelbar
+                      0% Zinsen für alle unsere Kunden
                     </p>
                   </div>
                   
@@ -198,8 +201,8 @@ const Financing = () => {
                   description: "Von 12 bis 84 Monaten wählbar"
                 },
                 {
-                  title: "Günstige Zinsen",
-                  description: "Ab 2,9% effektiver Jahreszins"
+                  title: "0% Zinsen",
+                  description: "Keine Zinsen für alle Kunden"
                 },
                 {
                   title: "Persönliche Beratung",
