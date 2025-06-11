@@ -17,6 +17,11 @@ const Header = () => {
     { name: 'Sendungsverfolgung', path: '/tracking' },
   ];
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-luxury-light-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,9 +31,9 @@ const Header = () => {
             <img 
               src="/lovable-uploads/3b45e4fd-7297-4980-8b0c-fef51b923a4d.png" 
               alt="AUTO IMPORT EXPORT Logo" 
-              className="h-10 md:h-12 w-auto mr-3"
+              className="h-8 md:h-10 w-auto mr-3"
             />
-            <div className="text-xl md:text-2xl font-bold text-luxury-black">
+            <div className="text-lg md:text-xl font-bold text-luxury-black">
               AUTO
               <span className="text-luxury-gold"> IMPORT </span>
               EXPORT
@@ -40,7 +45,7 @@ const Header = () => {
             {menuItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigation(item.path)}
                 className="text-luxury-gray hover:text-luxury-black transition-colors duration-300 font-medium"
               >
                 {item.name}
@@ -64,7 +69,7 @@ const Header = () => {
               variant="ghost" 
               size="icon"
               className="relative hover:bg-luxury-light-gray transition-colors"
-              onClick={() => navigate('/cart')}
+              onClick={() => handleNavigation('/cart')}
             >
               <ShoppingCart className="h-5 w-5 text-luxury-gray" />
               <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-luxury-gold text-white text-xs">
@@ -77,7 +82,7 @@ const Header = () => {
               variant="ghost" 
               size="icon"
               className="hover:bg-luxury-light-gray transition-colors"
-              onClick={() => navigate('/account')}
+              onClick={() => handleNavigation('/account')}
             >
               <User className="h-5 w-5 text-luxury-gray" />
             </Button>
@@ -101,10 +106,7 @@ const Header = () => {
               {menuItems.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => {
-                    navigate(item.path);
-                    setIsMenuOpen(false);
-                  }}
+                  onClick={() => handleNavigation(item.path)}
                   className="block w-full text-left px-4 py-2 text-luxury-gray hover:text-luxury-black hover:bg-luxury-light-gray transition-colors"
                 >
                   {item.name}
