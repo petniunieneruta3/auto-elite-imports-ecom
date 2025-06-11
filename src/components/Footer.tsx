@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Instagram, MessageSquare, Phone, Mail, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
+
   const quickLinks = [
     { name: 'Katalog', path: '/catalog' },
     { name: 'Dienstleistungen', path: '/services' },
@@ -56,12 +59,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
-                    href={link.path}
-                    className="text-gray-300 hover:text-luxury-gold transition-colors duration-300 text-sm"
+                  <button 
+                    onClick={() => navigate(link.path)}
+                    className="text-gray-300 hover:text-luxury-gold transition-colors duration-300 text-sm text-left"
                   >
                     {link.name}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -73,12 +76,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {serviceLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
-                    href={link.path}
-                    className="text-gray-300 hover:text-luxury-gold transition-colors duration-300 text-sm"
+                  <button 
+                    onClick={() => navigate(link.path)}
+                    className="text-gray-300 hover:text-luxury-gold transition-colors duration-300 text-sm text-left"
                   >
                     {link.name}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
