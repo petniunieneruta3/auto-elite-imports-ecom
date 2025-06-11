@@ -6,6 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Catalog from "./pages/Catalog";
+import Services from "./pages/Services";
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
+import Tracking from "./pages/Tracking";
+import Financing from "./pages/Financing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,13 +25,20 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/catalogue" element={<Catalog />} />
-          <Route path="/services" element={<Index />} />
-          <Route path="/faq" element={<Index />} />
-          <Route path="/contact" element={<Index />} />
-          <Route path="/tracking" element={<Index />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/tracking" element={<Tracking />} />
+          <Route path="/financing" element={<Financing />} />
           <Route path="/cart" element={<Index />} />
           <Route path="/account" element={<Index />} />
           <Route path="/vehicle/:id" element={<Index />} />
+          {/* Legal pages - redirecting to index for now */}
+          <Route path="/guarantees" element={<Index />} />
+          <Route path="/returns" element={<Index />} />
+          <Route path="/terms" element={<Index />} />
+          <Route path="/privacy" element={<Index />} />
+          <Route path="/cookies" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
