@@ -62,9 +62,9 @@ const CatalogReal = () => {
     const matchesSearch = vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vehicle.model.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesBrand = !brandFilter || vehicle.brand.toLowerCase() === brandFilter;
+    const matchesBrand = !brandFilter || brandFilter === 'all' || vehicle.brand.toLowerCase() === brandFilter;
     
-    const matchesPrice = !priceFilter || (() => {
+    const matchesPrice = !priceFilter || priceFilter === 'all' || (() => {
       const price = vehicle.price;
       switch (priceFilter) {
         case '0-50000': return price <= 50000;
@@ -75,7 +75,7 @@ const CatalogReal = () => {
       }
     })();
     
-    const matchesBadge = !badgeFilter || vehicle.badge.toLowerCase() === badgeFilter;
+    const matchesBadge = !badgeFilter || badgeFilter === 'all' || vehicle.badge.toLowerCase() === badgeFilter;
     
     return matchesSearch && matchesBrand && matchesPrice && matchesBadge;
   });
@@ -133,7 +133,7 @@ const CatalogReal = () => {
                     <SelectValue placeholder="Marke" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Toutes les marques</SelectItem>
+                    <SelectItem value="all">Toutes les marques</SelectItem>
                     {uniqueBrands.map(brand => (
                       <SelectItem key={brand} value={brand.toLowerCase()}>{brand}</SelectItem>
                     ))}
@@ -145,7 +145,7 @@ const CatalogReal = () => {
                     <SelectValue placeholder="Preisbereich" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous les prix</SelectItem>
+                    <SelectItem value="all">Tous les prix</SelectItem>
                     <SelectItem value="0-50000">Bis 50.000€</SelectItem>
                     <SelectItem value="50000-100000">50.000€ - 100.000€</SelectItem>
                     <SelectItem value="100000-200000">100.000€ - 200.000€</SelectItem>
@@ -158,7 +158,7 @@ const CatalogReal = () => {
                     <SelectValue placeholder="Niveau" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous les niveaux</SelectItem>
+                    <SelectItem value="all">Tous les niveaux</SelectItem>
                     <SelectItem value="elite">Elite</SelectItem>
                     <SelectItem value="collector">Collector</SelectItem>
                   </SelectContent>
