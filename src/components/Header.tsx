@@ -84,11 +84,18 @@ const Header = () => {
           <div className="flex items-center">
             <button 
               onClick={() => navigate('/')}
-              className="text-2xl font-bold text-luxury-black hover:text-luxury-gold transition-colors duration-300"
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-300"
             >
-              AUTO
-              <span className="text-luxury-gold"> IMPORT </span>
-              EXPORT
+              <img 
+                src="/lovable-uploads/1d94b90f-3c36-4dc1-b5ce-8ad945b51ab7.png" 
+                alt="Auto Import Export Logo" 
+                className="h-12 w-auto"
+              />
+              <div className="text-xl font-bold text-luxury-black">
+                AUTO
+                <span className="text-luxury-gold"> IMPORT </span>
+                EXPORT
+              </div>
             </button>
           </div>
 
