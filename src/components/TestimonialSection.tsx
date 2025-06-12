@@ -102,21 +102,21 @@ const TestimonialSection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <div className="inline-flex items-center space-x-8 bg-luxury-light-gray/30 rounded-full px-8 py-4">
+        <div className="text-center mt-8">
+          <div className="inline-flex items-center space-x-4 bg-luxury-light-gray/20 rounded-lg px-6 py-3">
             <div className="text-center">
-              <div className="text-2xl font-bold text-luxury-black">1000+</div>
-              <div className="text-sm text-luxury-gray">Zufriedene Kunden</div>
+              <div className="text-lg font-bold text-luxury-black">1000+</div>
+              <div className="text-xs text-luxury-gray">Zufriedene Kunden</div>
             </div>
-            <div className="h-8 w-px bg-luxury-gray/30"></div>
+            <div className="h-6 w-px bg-luxury-gray/30"></div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-luxury-black">4.9/5</div>
-              <div className="text-sm text-luxury-gray">Durchschnittsbewertung</div>
+              <div className="text-lg font-bold text-luxury-black">4.9/5</div>
+              <div className="text-xs text-luxury-gray">Durchschnittsbewertung</div>
             </div>
-            <div className="h-8 w-px bg-luxury-gray/30"></div>
+            <div className="h-6 w-px bg-luxury-gray/30"></div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-luxury-black">24 Mon.</div>
-              <div className="text-sm text-luxury-gray">Garantie inklusive</div>
+              <div className="text-lg font-bold text-luxury-black">24 Mon.</div>
+              <div className="text-xs text-luxury-gray">Garantie inklusive</div>
             </div>
           </div>
         </div>

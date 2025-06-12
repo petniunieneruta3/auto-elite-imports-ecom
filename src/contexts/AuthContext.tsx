@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .eq('role', 'admin')
               .single();
             
-            setIsAdmin(!error && data);
+            setIsAdmin(!error && !!data);
           }, 0);
         } else {
           setIsAdmin(false);
