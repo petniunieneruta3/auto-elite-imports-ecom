@@ -1,72 +1,124 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, Eye, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Vehicle {
+  id: string;
+  brand: string;
+  model: string;
+  year: number;
+  price: number;
+  mileage: number;
+  fuel: string;
+  power: string;
+  image_url: string;
+  badge: string;
+  rating: number;
+  location: string;
+}
 
 const FeaturedVehicles = () => {
   const navigate = useNavigate();
+  const [featuredCars, setFeaturedCars] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const featuredCars = [
-    {
-      id: 1,
-      brand: 'BMW',
-      model: 'M5 Competition',
-      year: 2022,
-      price: '89.500',
-      mileage: '15.000',
-      fuel: 'Benzin',
-      power: '625 PS',
-      image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      badge: 'Elite',
-      rating: 4.9,
-      location: 'Oranienburg'
-    },
-    {
-      id: 2,
-      brand: 'Mercedes',
-      model: 'AMG GT 63 S',
-      year: 2023,
-      price: '125.900',
-      mileage: '8.500',
-      fuel: 'Benzin',
-      power: '630 PS',
-      image: 'https://images.unsplash.com/photo-1563694983011-6f4d90358083?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      badge: 'Collector',
-      rating: 5.0,
-      location: 'Oranienburg'
-    },
-    {
-      id: 3,
-      brand: 'Porsche',
-      model: '911 Turbo S',
-      year: 2023,
-      price: '198.500',
-      mileage: '5.200',
-      fuel: 'Benzin',
-      power: '650 PS',
-      image: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      badge: 'Collector',
-      rating: 5.0,
-      location: 'Oranienburg'
-    },
-    {
-      id: 4,
-      brand: 'Audi',
-      model: 'RS6 Avant',
-      year: 2022,
-      price: '95.800',
-      mileage: '12.000',
-      fuel: 'Benzin',
-      power: '600 PS',
-      image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      badge: 'Elite',
-      rating: 4.8,
-      location: 'Oranienburg'
+  useEffect(() => {
+    fetchFeaturedVehicles();
+  }, []);
+
+  const fetchFeaturedVehicles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('*')
+        .limit(4)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setFeaturedCars(data || []);
+    } catch (error) {
+      console.error('Error fetching featured vehicles:', error);
+      // Fallback data if database fetch fails
+      setFeaturedCars([
+        {
+          id: 'demo-1',
+          brand: 'BMW',
+          model: 'M5 Competition',
+          year: 2022,
+          price: 89500,
+          mileage: 15000,
+          fuel: 'Benzin',
+          power: '625 PS',
+          image_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          badge: 'Elite',
+          rating: 4.9,
+          location: 'Oranienburg'
+        },
+        {
+          id: 'demo-2',
+          brand: 'Mercedes',
+          model: 'AMG GT 63 S',
+          year: 2023,
+          price: 125900,
+          mileage: 8500,
+          fuel: 'Benzin',
+          power: '630 PS',
+          image_url: 'https://images.unsplash.com/photo-1563694983011-6f4d90358083?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          badge: 'Collector',
+          rating: 5.0,
+          location: 'Oranienburg'
+        },
+        {
+          id: 'demo-3',
+          brand: 'Porsche',
+          model: '911 Turbo S',
+          year: 2023,
+          price: 198500,
+          mileage: 5200,
+          fuel: 'Benzin',
+          power: '650 PS',
+          image_url: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          badge: 'Collector',
+          rating: 5.0,
+          location: 'Oranienburg'
+        },
+        {
+          id: 'demo-4',
+          brand: 'Audi',
+          model: 'RS6 Avant',
+          year: 2022,
+          price: 95800,
+          mileage: 12000,
+          fuel: 'Benzin',
+          power: '600 PS',
+          image_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          badge: 'Elite',
+          rating: 4.8,
+          location: 'Oranienburg'
+        }
+      ]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-luxury-gold mx-auto"></div>
+            <p className="mt-4 text-luxury-gray">Chargement des véhicules...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-gray-50">
@@ -86,7 +138,7 @@ const FeaturedVehicles = () => {
             <Card key={car.id} className="group hover:shadow-xl transition-all duration-300 border-0 overflow-hidden">
               <div className="relative">
                 <img 
-                  src={car.image} 
+                  src={car.image_url} 
                   alt={`${car.brand} ${car.model}`}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -127,7 +179,7 @@ const FeaturedVehicles = () => {
                   <div>
                     <span className="font-medium">Kilometerstand:</span>
                     <br />
-                    {car.mileage} km
+                    {car.mileage.toLocaleString()} km
                   </div>
                   <div>
                     <span className="font-medium">Kraftstoff:</span>
@@ -149,7 +201,7 @@ const FeaturedVehicles = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-2xl font-bold text-luxury-black">
-                      €{car.price}
+                      €{car.price.toLocaleString()}
                     </span>
                     <p className="text-xs text-luxury-gray">Festpreis</p>
                   </div>

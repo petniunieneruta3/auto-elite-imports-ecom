@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -46,14 +45,106 @@ const VehicleDetail = () => {
 
   const fetchVehicle = async (vehicleId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select('*')
-        .eq('id', vehicleId)
-        .single();
+      console.log('Fetching vehicle with ID:', vehicleId);
+      
+      // Check if it's a demo ID (for fallback data)
+      if (vehicleId.startsWith('demo-')) {
+        const demoVehicles: { [key: string]: Vehicle } = {
+          'demo-1': {
+            id: 'demo-1',
+            brand: 'BMW',
+            model: 'M5 Competition',
+            year: 2022,
+            price: 89500,
+            mileage: 15000,
+            fuel: 'Benzin',
+            power: '625 PS',
+            transmission: 'Automatique',
+            color: 'Noir',
+            image_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            badge: 'Elite',
+            rating: 4.9,
+            location: 'Oranienburg',
+            availability: 'Sofort verfügbar',
+            description: 'Magnifique BMW M5 Competition de 2022 en excellent état. Ce véhicule premium combine performance, luxe et fiabilité pour une expérience de conduite exceptionnelle.'
+          },
+          'demo-2': {
+            id: 'demo-2',
+            brand: 'Mercedes',
+            model: 'AMG GT 63 S',
+            year: 2023,
+            price: 125900,
+            mileage: 8500,
+            fuel: 'Benzin',
+            power: '630 PS',
+            transmission: 'Automatique',
+            color: 'Argent',
+            image_url: 'https://images.unsplash.com/photo-1563694983011-6f4d90358083?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            badge: 'Collector',
+            rating: 5.0,
+            location: 'Oranienburg',
+            availability: 'Sofort verfügbar',
+            description: 'Mercedes AMG GT 63 S 2023, véhicule d\'exception alliant puissance et élégance.'
+          },
+          'demo-3': {
+            id: 'demo-3',
+            brand: 'Porsche',
+            model: '911 Turbo S',
+            year: 2023,
+            price: 198500,
+            mileage: 5200,
+            fuel: 'Benzin',
+            power: '650 PS',
+            transmission: 'Automatique',
+            color: 'Rouge',
+            image_url: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            badge: 'Collector',
+            rating: 5.0,
+            location: 'Oranienburg',
+            availability: 'Sofort verfügbar',
+            description: 'Porsche 911 Turbo S 2023, le summum de la performance sportive allemande.'
+          },
+          'demo-4': {
+            id: 'demo-4',
+            brand: 'Audi',
+            model: 'RS6 Avant',
+            year: 2022,
+            price: 95800,
+            mileage: 12000,
+            fuel: 'Benzin',
+            power: '600 PS',
+            transmission: 'Automatique',
+            color: 'Bleu',
+            image_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            badge: 'Elite',
+            rating: 4.8,
+            location: 'Oranienburg',
+            availability: 'Sofort verfügbar',
+            description: 'Audi RS6 Avant 2022, le break sportif par excellence.'
+          }
+        };
+        
+        const demoVehicle = demoVehicles[vehicleId];
+        if (demoVehicle) {
+          setVehicle(demoVehicle);
+        } else {
+          throw new Error('Demo vehicle not found');
+        }
+      } else {
+        // Try to fetch from database
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('id', vehicleId)
+          .maybeSingle();
 
-      if (error) throw error;
-      setVehicle(data);
+        if (error) throw error;
+        if (data) {
+          setVehicle(data);
+        } else {
+          throw new Error('Vehicle not found in database');
+        }
+      }
     } catch (error) {
       console.error('Error fetching vehicle:', error);
       toast({
@@ -110,6 +201,7 @@ const VehicleDetail = () => {
         <main className="pt-20 py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-2xl font-bold text-luxury-black mb-4">Véhicule non trouvé</h1>
+            <p className="text-luxury-gray mb-6">Le véhicule que vous recherchez n'existe pas ou n'est plus disponible.</p>
             <Button onClick={() => navigate('/catalog')} className="bg-luxury-gold hover:bg-luxury-dark-gold text-black">
               Retour au catalogue
             </Button>
