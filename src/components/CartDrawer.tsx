@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useCart } from '@/contexts/CartContext';
 import {
@@ -12,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Minus, Plus, Trash2, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const CartDrawer = () => {
   const { 
@@ -23,6 +23,20 @@ const CartDrawer = () => {
     clearCart, 
     getTotalPrice 
   } = useCart();
+  const { toast } = useToast();
+
+  const handleOrder = () => {
+    toast({
+      title: "Commande confirmée",
+      description: `Votre commande de ${items.length} article(s) pour un total de €${getTotalPrice().toLocaleString()} a été envoyée.`,
+    });
+    
+    // Clear the cart after order
+    clearCart();
+    
+    // Close the drawer
+    setIsOpen(false);
+  };
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -116,6 +130,7 @@ const CartDrawer = () => {
                 </Button>
                 <Button 
                   className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black"
+                  onClick={handleOrder}
                 >
                   Commander
                 </Button>
