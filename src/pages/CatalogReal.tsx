@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, Heart, Eye, Star, Grid3X3, List } from 'lucide-react';
+import { Search, Filter, Heart, Eye, Star, Grid3X3, List, ShoppingCart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface Vehicle {
   id: string;
@@ -37,6 +38,8 @@ const CatalogReal = () => {
   const [brandFilter, setBrandFilter] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
   const [badgeFilter, setBadgeFilter] = useState('');
+  const { addToCart } = useCart();
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchVehicles();
@@ -56,6 +59,22 @@ const CatalogReal = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddToCart = (vehicle: Vehicle) => {
+    addToCart({
+      id: vehicle.id,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      price: vehicle.price,
+      image_url: vehicle.image_url,
+    });
+    
+    toast({
+      title: "Ajouté au panier",
+      description: `${vehicle.brand} ${vehicle.model} a été ajouté à votre panier.`,
+    });
   };
 
   const filteredVehicles = vehicles.filter(vehicle => {
@@ -216,7 +235,7 @@ const CatalogReal = () => {
                       <Badge 
                         className={`${
                           vehicle.badge === 'Collector' 
-                            ? 'bg-luxury-gold text-black' 
+                            ? 'bg-luxury-gold text-black'
                             : 'bg-luxury-black text-white'
                         } font-medium`}
                       >
@@ -302,9 +321,11 @@ const CatalogReal = () => {
                         </Button>
                         <Button 
                           size="sm"
+                          onClick={() => handleAddToCart(vehicle)}
                           className="bg-luxury-gold hover:bg-luxury-dark-gold text-black transition-all duration-300"
                         >
-                          Details
+                          <ShoppingCart className="h-4 w-4 mr-1" />
+                          Panier
                         </Button>
                       </div>
                     </div>
