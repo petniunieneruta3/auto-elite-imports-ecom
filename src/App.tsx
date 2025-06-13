@@ -9,6 +9,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import Index from "./pages/Index";
 import Catalog from "./pages/Catalog";
 import CatalogReal from "./pages/CatalogReal";
+import VehicleDetail from "./pages/VehicleDetail";
 import Services from "./pages/Services";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/catalog" element={<CatalogReal />} />
               <Route path="/catalogue" element={<CatalogReal />} />
               <Route path="/catalog-demo" element={<Catalog />} />
+              <Route path="/vehicle/:id" element={<VehicleDetail />} />
               <Route path="/services" element={<Services />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
@@ -47,7 +49,6 @@ const App = () => (
               <Route path="/admin" element={<Admin />} />
               <Route path="/cart" element={<Index />} />
               <Route path="/account" element={<Index />} />
-              <Route path="/vehicle/:id" element={<Index />} />
               {/* Legal pages */}
               <Route path="/guarantees" element={<Guarantees />} />
               <Route path="/returns" element={<Returns />} />
