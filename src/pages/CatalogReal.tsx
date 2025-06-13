@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,6 +32,7 @@ interface Vehicle {
 }
 
 const CatalogReal = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -74,6 +76,17 @@ const CatalogReal = () => {
     toast({
       title: "Ajouté au panier",
       description: `${vehicle.brand} ${vehicle.model} a été ajouté à votre panier.`,
+    });
+  };
+
+  const handleViewDetails = (vehicleId: string) => {
+    navigate(`/vehicle/${vehicleId}`);
+  };
+
+  const handleCompare = (vehicle: Vehicle) => {
+    toast({
+      title: "Comparaison",
+      description: `${vehicle.brand} ${vehicle.model} ajouté à la comparaison.`,
     });
   };
 
@@ -227,9 +240,10 @@ const CatalogReal = () => {
                     <img 
                       src={vehicle.image_url} 
                       alt={`${vehicle.brand} ${vehicle.model}`}
-                      className={`object-cover group-hover:scale-105 transition-transform duration-300 ${
+                      className={`object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer ${
                         viewMode === 'list' ? 'w-full h-full' : 'w-full h-48'
                       }`}
+                      onClick={() => handleViewDetails(vehicle.id)}
                     />
                     <div className="absolute top-3 left-3">
                       <Badge 
@@ -246,7 +260,12 @@ const CatalogReal = () => {
                       <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
                         <Heart className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 bg-white/80 hover:bg-white"
+                        onClick={() => handleViewDetails(vehicle.id)}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
@@ -258,7 +277,10 @@ const CatalogReal = () => {
                   
                   <CardContent className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
                     <div className="mb-3">
-                      <h3 className="font-bold text-lg text-luxury-black">
+                      <h3 
+                        className="font-bold text-lg text-luxury-black cursor-pointer hover:text-luxury-gold transition-colors"
+                        onClick={() => handleViewDetails(vehicle.id)}
+                      >
                         {vehicle.brand} {vehicle.model}
                       </h3>
                       <p className="text-luxury-gray text-sm">{vehicle.year} • {vehicle.location}</p>
@@ -316,8 +338,17 @@ const CatalogReal = () => {
                           size="sm"
                           variant="outline"
                           className="border-luxury-black text-luxury-black hover:bg-luxury-black hover:text-white"
+                          onClick={() => handleCompare(vehicle)}
                         >
                           Vergleichen
+                        </Button>
+                        <Button 
+                          size="sm"
+                          onClick={() => handleViewDetails(vehicle.id)}
+                          variant="outline"
+                          className="border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-black transition-all duration-300"
+                        >
+                          Détails
                         </Button>
                         <Button 
                           size="sm"
