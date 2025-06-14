@@ -47,6 +47,7 @@ const App = () => (
               <Route path="/financing" element={<Financing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/simple-admin" element={<SimpleAdmin />} />
               <Route path="/cart" element={<Index />} />
               <Route path="/account" element={<Index />} />
               {/* Legal pages */}
