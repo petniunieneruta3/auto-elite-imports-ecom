@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import VehicleGrid from './VehicleGrid';
@@ -26,6 +25,7 @@ import { addVolkswagenGolfRLine } from '@/utils/addVolkswagenGolfRLine';
 import { addPorscheCayenneCoupe } from '@/utils/addPorscheCayenneCoupe';
 import { addAudiA3Sportback } from '@/utils/addAudiA3Sportback';
 import { addFordMondeoHybrid } from '@/utils/addFordMondeoHybrid';
+import { addRangeRoverEvoque } from '@/utils/addRangeRoverEvoque';
 
 interface Vehicle {
   id: string;
@@ -73,6 +73,7 @@ const FeaturedVehicles = () => {
       await addPorscheCayenneCoupe();
       await addAudiA3Sportback();
       await addFordMondeoHybrid();
+      await addRangeRoverEvoque();
       fetchFeaturedVehicles();
     };
     
