@@ -134,12 +134,12 @@ const Header = () => {
                   </Badge>
                 )}
               </Button>
-              <Button 
+              <button 
                 onClick={() => navigate('/contact')}
-                className="bg-luxury-gold hover:bg-luxury-dark-gold text-white font-semibold px-6 py-2 transition-all duration-300 border-2 border-luxury-gold hover:border-luxury-dark-gold"
+                className="bg-luxury-gold hover:bg-luxury-dark-gold text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 border-2 border-luxury-gold hover:border-luxury-dark-gold inline-flex items-center justify-center whitespace-nowrap"
               >
                 Beratung anfordern
-              </Button>
+              </button>
             </div>
 
             {/* Mobile menu button */}
@@ -224,15 +224,15 @@ const Header = () => {
                 </button>
               )}
               
-              <Button 
+              <button 
                 onClick={() => {
                   navigate('/contact');
                   setIsMenuOpen(false);
                 }}
-                className="w-full bg-luxury-gold hover:bg-luxury-dark-gold text-white font-semibold mt-4 border-2 border-luxury-gold hover:border-luxury-dark-gold"
+                className="w-full bg-luxury-gold hover:bg-luxury-dark-gold text-white font-semibold mt-4 border-2 border-luxury-gold hover:border-luxury-dark-gold px-6 py-2 rounded-md transition-all duration-300 inline-flex items-center justify-center"
               >
                 Beratung anfordern
-              </Button>
+              </button>
             </div>
           </div>
         )}
