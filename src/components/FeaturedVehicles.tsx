@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -136,7 +137,7 @@ const FeaturedVehicles = () => {
         .from('vehicles')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(8);
+        .limit(50);
 
       if (error) {
         console.error('FeaturedVehicles: Error fetching vehicles:', error);
@@ -179,3 +180,4 @@ const FeaturedVehicles = () => {
 };
 
 export default FeaturedVehicles;
+
