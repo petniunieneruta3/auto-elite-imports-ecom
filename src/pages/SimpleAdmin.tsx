@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, AlertCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
@@ -36,6 +36,7 @@ const SimpleAdmin = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
   useEffect(() => {
     fetchVehicles();
@@ -45,6 +46,8 @@ const SimpleAdmin = () => {
     console.log('Fetching vehicles...');
     try {
       setError(null);
+      setLoading(true);
+      
       const { data, error: fetchError } = await supabase
         .from('vehicles')
         .select('*')
@@ -54,14 +57,15 @@ const SimpleAdmin = () => {
 
       if (fetchError) {
         console.error('Supabase error:', fetchError);
-        throw fetchError;
+        throw new Error(fetchError.message);
       }
       
       console.log('Vehicles fetched:', data?.length || 0);
       setVehicles(data || []);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
-      setError(`Erreur lors du chargement: ${error}`);
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      setError(`Erreur lors du chargement: ${errorMessage}`);
       toast({
         title: "Erreur de connexion",
         description: "Impossible de charger les véhicules. Vérifiez votre connexion.",
@@ -77,35 +81,67 @@ const SimpleAdmin = () => {
       return;
     }
 
-    console.log('Deleting vehicle:', id);
-
+    console.log('Starting deletion for vehicle ID:', id);
+    
     try {
-      const { error: deleteError } = await supabase
+      setDeleteLoading(id);
+      
+      // First, let's check if the vehicle exists
+      const { data: existingVehicle, error: checkError } = await supabase
+        .from('vehicles')
+        .select('id, brand, model')
+        .eq('id', id)
+        .single();
+
+      console.log('Vehicle check result:', { existingVehicle, checkError });
+
+      if (checkError) {
+        console.error('Error checking vehicle:', checkError);
+        throw new Error(`Véhicule non trouvé: ${checkError.message}`);
+      }
+
+      // Now delete the vehicle
+      const { error: deleteError, data: deleteData } = await supabase
         .from('vehicles')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      console.log('Delete response:', deleteError);
+      console.log('Delete operation result:', { deleteError, deleteData });
 
       if (deleteError) {
         console.error('Delete error:', deleteError);
-        throw deleteError;
+        throw new Error(`Erreur de suppression: ${deleteError.message}`);
       }
+
+      // Optimistically remove from local state immediately
+      setVehicles(prevVehicles => prevVehicles.filter(vehicle => vehicle.id !== id));
+
+      console.log('Vehicle deleted successfully, updating UI');
 
       toast({
         title: "Véhicule supprimé",
-        description: "Le véhicule a été supprimé avec succès",
+        description: `${existingVehicle.brand} ${existingVehicle.model} a été supprimé avec succès`,
       });
 
-      // Refresh the list immediately
-      await fetchVehicles();
+      // Refresh the list to ensure consistency
+      setTimeout(() => {
+        fetchVehicles();
+      }, 500);
+
     } catch (error) {
-      console.error('Error deleting vehicle:', error);
+      console.error('Error during deletion:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       toast({
-        title: "Erreur",
-        description: `Impossible de supprimer le véhicule: ${error}`,
+        title: "Erreur de suppression",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      // Refresh the list to show current state
+      fetchVehicles();
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -119,6 +155,7 @@ const SimpleAdmin = () => {
     console.log('Form closed, refreshing vehicles...');
     setShowForm(false);
     setEditingVehicle(null);
+    // Always refresh after form closes
     fetchVehicles();
   };
 
@@ -177,6 +214,7 @@ const SimpleAdmin = () => {
                     onClick={fetchVehicles}
                     disabled={loading}
                   >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                     Actualiser
                   </Button>
                   <Button
@@ -246,7 +284,9 @@ const SimpleAdmin = () => {
                             <span className={`px-2 py-1 rounded-full text-xs ${
                               vehicle.availability === 'Sofort verfügbar'
                                 ? 'bg-green-100 text-green-800'
-                                : 'bg-orange-100 text-orange-800'
+                                : vehicle.availability === 'Reserviert'
+                                ? 'bg-orange-100 text-orange-800'
+                                : 'bg-red-100 text-red-800'
                             }`}>
                               {vehicle.availability}
                             </span>
@@ -257,6 +297,7 @@ const SimpleAdmin = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleEdit(vehicle)}
+                                disabled={deleteLoading === vehicle.id}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -264,9 +305,14 @@ const SimpleAdmin = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleDelete(vehicle.id)}
+                                disabled={deleteLoading === vehicle.id}
                                 className="hover:bg-red-50 hover:border-red-200"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                {deleteLoading === vehicle.id ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
                               </Button>
                             </div>
                           </TableCell>

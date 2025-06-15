@@ -58,55 +58,76 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!formData.brand.trim() || !formData.model.trim() || !formData.power.trim() || !formData.color.trim()) {
+      setError('Veuillez remplir tous les champs obligatoires (marque, modèle, puissance, couleur)');
+      return;
+    }
+
+    if (formData.price <= 0 || formData.mileage < 0 || formData.year < 1900 || formData.year > 2030) {
+      setError('Veuillez vérifier les valeurs numériques (prix > 0, kilométrage >= 0, année valide)');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
-    console.log('Submitting form:', { vehicle: !!vehicle, formData });
+    console.log('Submitting form:', { 
+      isUpdate: !!vehicle, 
+      vehicleId: vehicle?.id,
+      formData 
+    });
 
     try {
       if (vehicle) {
         // Update existing vehicle
         console.log('Updating vehicle:', vehicle.id);
-        const { error: updateError } = await supabase
+        
+        const { error: updateError, data: updateData } = await supabase
           .from('vehicles')
           .update(formData)
-          .eq('id', vehicle.id);
+          .eq('id', vehicle.id)
+          .select();
 
-        console.log('Update response:', updateError);
+        console.log('Update response:', { updateError, updateData });
 
         if (updateError) {
           console.error('Update error:', updateError);
-          throw updateError;
+          throw new Error(updateError.message);
         }
 
         toast({
           title: "Véhicule modifié",
-          description: "Le véhicule a été modifié avec succès",
+          description: `${formData.brand} ${formData.model} a été modifié avec succès`,
         });
       } else {
         // Create new vehicle
         console.log('Creating new vehicle');
-        const { error: insertError } = await supabase
+        
+        const { error: insertError, data: insertData } = await supabase
           .from('vehicles')
-          .insert([formData]);
+          .insert([formData])
+          .select();
 
-        console.log('Insert response:', insertError);
+        console.log('Insert response:', { insertError, insertData });
 
         if (insertError) {
           console.error('Insert error:', insertError);
-          throw insertError;
+          throw new Error(insertError.message);
         }
 
         toast({
           title: "Véhicule ajouté",
-          description: "Le véhicule a été ajouté avec succès",
+          description: `${formData.brand} ${formData.model} a été ajouté avec succès`,
         });
       }
 
+      // Close form after successful operation
       onClose();
     } catch (error) {
       console.error('Form submission error:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       setError(errorMessage);
       toast({
         title: "Erreur",
@@ -122,6 +143,8 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
   return (
@@ -154,6 +177,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                   value={formData.brand}
                   onChange={(e) => handleChange('brand', e.target.value)}
                   required
+                  placeholder="ex: BMW, Mercedes, Audi..."
                 />
               </div>
               <div>
@@ -163,6 +187,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                   value={formData.model}
                   onChange={(e) => handleChange('model', e.target.value)}
                   required
+                  placeholder="ex: M3, E63, RS6..."
                 />
               </div>
               <div>
@@ -182,11 +207,12 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                 <Input
                   id="price"
                   type="number"
-                  min="0"
+                  min="1"
                   step="0.01"
                   value={formData.price}
                   onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)}
                   required
+                  placeholder="ex: 75000"
                 />
               </div>
               <div>
@@ -198,6 +224,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                   value={formData.mileage}
                   onChange={(e) => handleChange('mileage', parseInt(e.target.value) || 0)}
                   required
+                  placeholder="ex: 15000"
                 />
               </div>
               <div>
@@ -220,7 +247,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                   id="power"
                   value={formData.power}
                   onChange={(e) => handleChange('power', e.target.value)}
-                  placeholder="625 PS"
+                  placeholder="ex: 625 PS"
                   required
                 />
               </div>
@@ -245,6 +272,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                   value={formData.color}
                   onChange={(e) => handleChange('color', e.target.value)}
                   required
+                  placeholder="ex: Noir, Blanc, Rouge..."
                 />
               </div>
               <div>
@@ -293,7 +321,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                 type="url"
                 value={formData.image_url}
                 onChange={(e) => handleChange('image_url', e.target.value)}
-                placeholder="https://..."
+                placeholder="https://exemple.com/image.jpg"
               />
             </div>
 
