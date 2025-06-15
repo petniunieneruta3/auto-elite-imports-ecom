@@ -36,7 +36,7 @@ export const addAudiA5Gtron = async () => {
         badge: 'Elite',
         rating: 4.3,
         location: 'Oranienburg',
-        availability: 'Sur commande',
+        availability: 'Auf Bestellung verfügbar',
         description: `Audi A5 40 g-tron S-line LED KAMERA AHK TEMPOMAT
 
 État : Voiture d'occasion, sans accident
