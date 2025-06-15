@@ -9,6 +9,7 @@ import { addVolvoV90 } from '@/utils/addVolvoV90';
 import { addRenaultCaptur } from '@/utils/addRenaultCaptur';
 import { addRenaultArkana } from '@/utils/addRenaultArkana';
 import { addAudiQ8 } from '@/utils/addAudiQ8';
+import { addMercedesGLEAMG53 } from '@/utils/addMercedesGLEAMG53';
 
 interface Vehicle {
   id: string;
@@ -39,6 +40,7 @@ const FeaturedVehicles = () => {
       await addRenaultCaptur();
       await addRenaultArkana();
       await addAudiQ8();
+      await addMercedesGLEAMG53();
       fetchFeaturedVehicles();
     };
     
