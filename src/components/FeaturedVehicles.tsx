@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import VehicleGrid from './VehicleGrid';
@@ -36,6 +37,7 @@ import { addBMWM340d } from '@/utils/addBMWM340d';
 import { addVolkswagenGolfGTITCR } from '@/utils/addVolkswagenGolfGTITCR';
 import { addVolkswagenGolfGTI2021 } from '@/utils/addVolkswagenGolfGTI2021';
 import { addAudiS7Sportback } from '@/utils/addAudiS7Sportback';
+import { addRangeRoverEvoque2021 } from '@/utils/addRangeRoverEvoque2021';
 
 interface Vehicle {
   id: string;
@@ -98,7 +100,8 @@ const FeaturedVehicles = () => {
         addBMWM340d(),
         addVolkswagenGolfGTITCR(),
         addVolkswagenGolfGTI2021(),
-        addAudiS7Sportback()
+        addAudiS7Sportback(),
+        addRangeRoverEvoque2021()
       ];
 
       // Execute all vehicle additions in parallel
