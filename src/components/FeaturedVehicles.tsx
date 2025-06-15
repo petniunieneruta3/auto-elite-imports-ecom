@@ -49,46 +49,16 @@ interface Vehicle {
 const FeaturedVehicles = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initializingVehicles, setInitializingVehicles] = useState(true);
 
   useEffect(() => {
-    console.log('FeaturedVehicles: Component mounted, adding vehicles and fetching...');
+    console.log('FeaturedVehicles: Component mounted, fetching vehicles first...');
     
-    // Add vehicles if they don't exist, then fetch vehicles
-    const initializeVehicles = async () => {
-      await addMercedesCLA();
-      await addMercedesCLA200d();
-      await addMercedesCLA200AMG();
-      await addMercedesCLA200AMGLine();
-      await addVolvoXC60();
-      await addVolvoV90();
-      await addRenaultCaptur();
-      await addRenaultArkana();
-      await addAudiQ8();
-      await addAudiQ3();
-      await addMercedesGLEAMG53();
-      await addFordMustang();
-      await addMercedesG63AMG();
-      await addMercedesGLC43AMG();
-      await addMercedesGLE350d();
-      await addVolkswagenGolfGTE();
-      await addBMWX3();
-      await addBMWX4();
-      await addMercedesGLA45SAMG();
-      await addCitroenC4();
-      await addVolkswagenGolfRLine();
-      await addPorscheCayenneCoupe();
-      await addAudiA3Sportback();
-      await addFordMondeoHybrid();
-      await addRangeRoverEvoque();
-      await addMercedesA180d();
-      await addRangeRoverEvoqueRDynamic();
-      await addBMWX2MSport();
-      await addBMWX1MSport();
-      await addAudiA5Gtron();
-      fetchFeaturedVehicles();
-    };
-    
-    initializeVehicles();
+    // Fetch vehicles immediately to show what's already there
+    fetchFeaturedVehicles().then(() => {
+      // Then initialize missing vehicles in the background
+      initializeVehiclesInBackground();
+    });
     
     const channel = supabase
       .channel('vehicles')
@@ -107,10 +77,60 @@ const FeaturedVehicles = () => {
     };
   }, []);
 
+  const initializeVehiclesInBackground = async () => {
+    console.log('FeaturedVehicles: Initializing vehicles in background...');
+    setInitializingVehicles(true);
+    
+    // Execute all vehicle additions in parallel instead of sequentially
+    const vehicleInitializers = [
+      addMercedesCLA,
+      addMercedesCLA200d,
+      addMercedesCLA200AMG,
+      addMercedesCLA200AMGLine,
+      addVolvoXC60,
+      addVolvoV90,
+      addRenaultCaptur,
+      addRenaultArkana,
+      addAudiQ8,
+      addAudiQ3,
+      addMercedesGLEAMG53,
+      addFordMustang,
+      addMercedesG63AMG,
+      addMercedesGLC43AMG,
+      addMercedesGLE350d,
+      addVolkswagenGolfGTE,
+      addBMWX3,
+      addBMWX4,
+      addMercedesGLA45SAMG,
+      addCitroenC4,
+      addVolkswagenGolfRLine,
+      addPorscheCayenneCoupe,
+      addAudiA3Sportback,
+      addFordMondeoHybrid,
+      addRangeRoverEvoque,
+      addMercedesA180d,
+      addRangeRoverEvoqueRDynamic,
+      addBMWX2MSport,
+      addBMWX1MSport,
+      addAudiA5Gtron,
+    ];
+
+    try {
+      // Execute all vehicle additions in parallel
+      await Promise.all(vehicleInitializers.map(initializer => initializer()));
+      console.log('FeaturedVehicles: All vehicles initialized successfully');
+    } catch (error) {
+      console.error('FeaturedVehicles: Error initializing vehicles:', error);
+    } finally {
+      setInitializingVehicles(false);
+      // Fetch vehicles again after initialization to get any newly added vehicles
+      fetchFeaturedVehicles();
+    }
+  };
+
   const fetchFeaturedVehicles = async () => {
     try {
       console.log('FeaturedVehicles: Fetching featured vehicles...');
-      setLoading(true);
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
@@ -120,7 +140,7 @@ const FeaturedVehicles = () => {
       if (error) {
         console.error('FeaturedVehicles: Error fetching vehicles:', error);
       } else {
-        console.log('FeaturedVehicles: Vehicles fetched successfully:', data);
+        console.log('FeaturedVehicles: Vehicles fetched successfully:', data?.length || 0, 'vehicles');
         setVehicles(data || []);
       }
     } catch (error) {
@@ -144,9 +164,16 @@ const FeaturedVehicles = () => {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-luxury-black text-center mb-8">
-          Nos Véhicules Vedettes
-        </h2>
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-luxury-black mb-2">
+            Nos Véhicules Vedettes
+          </h2>
+          {initializingVehicles && (
+            <p className="text-sm text-luxury-gray">
+              Initialisation des nouveaux véhicules en cours...
+            </p>
+          )}
+        </div>
         <VehicleGrid vehicles={vehicles} />
       </div>
     </section>
