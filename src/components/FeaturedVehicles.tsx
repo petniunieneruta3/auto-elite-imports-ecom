@@ -96,6 +96,9 @@ const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
 const FeaturedVehicles = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [displayedVehicles, setDisplayedVehicles] = useState<Vehicle[]>([]);
+  const [showCount, setShowCount] = useState(8); // Initial number of vehicles to show
+  const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     console.log('FeaturedVehicles: Component mounted, adding vehicles and fetching...');
@@ -154,6 +157,17 @@ const FeaturedVehicles = () => {
     }
   };
 
+  // Update displayed vehicles when vehicles or showCount changes
+  useEffect(() => {
+    const vehiclesToShow = vehicles.slice(0, showCount);
+    setDisplayedVehicles(vehiclesToShow);
+    setHasMore(vehicles.length > showCount);
+  }, [vehicles, showCount]);
+
+  const handleShowMore = () => {
+    setShowCount(prev => prev + 8); // Show 8 more vehicles each time
+  };
+
   if (loading) {
     return (
       <section className="py-16 bg-white">
@@ -172,10 +186,21 @@ const FeaturedVehicles = () => {
           Nos Véhicules Vedettes
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {vehicles.map((vehicle) => (
+          {displayedVehicles.map((vehicle) => (
             <VehicleCard key={vehicle.id} vehicle={vehicle} />
           ))}
         </div>
+        
+        {hasMore && (
+          <div className="flex justify-center mt-12">
+            <Button
+              onClick={handleShowMore}
+              className="bg-luxury-gold hover:bg-luxury-dark-gold text-black font-medium px-8 py-3 transition-all duration-300"
+            >
+              Voir plus de véhicules
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
