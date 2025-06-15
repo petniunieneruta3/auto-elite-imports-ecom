@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +28,28 @@ const FeaturedVehicles = () => {
 
   useEffect(() => {
     fetchFeaturedVehicles();
+    
+    // Set up real-time subscription for vehicle changes
+    const channel = supabase
+      .channel('vehicles-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'vehicles'
+        },
+        (payload) => {
+          console.log('Vehicle change detected:', payload);
+          // Refresh the vehicles list when any change occurs
+          fetchFeaturedVehicles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchFeaturedVehicles = async () => {

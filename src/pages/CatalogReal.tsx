@@ -45,6 +45,28 @@ const CatalogReal = () => {
 
   useEffect(() => {
     fetchVehicles();
+    
+    // Set up real-time subscription for vehicle changes
+    const channel = supabase
+      .channel('catalog-vehicles-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'vehicles'
+        },
+        (payload) => {
+          console.log('Vehicle change detected in catalog:', payload);
+          // Refresh the vehicles list when any change occurs
+          fetchVehicles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchVehicles = async () => {
