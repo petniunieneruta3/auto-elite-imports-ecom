@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Heart, Eye, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useVehicleImages } from '@/hooks/useVehicleImages';
 
 interface Vehicle {
   id: string;
@@ -20,6 +21,94 @@ interface Vehicle {
   rating: number;
   location: string;
 }
+
+const VehicleCard = ({ car }: { car: Vehicle }) => {
+  const navigate = useNavigate();
+  const { primaryImage } = useVehicleImages(car.id);
+  
+  return (
+    <Card className="group hover:shadow-xl transition-all duration-300 border-0 overflow-hidden">
+      <div className="relative">
+        <img 
+          src={primaryImage || car.image_url} 
+          alt={`${car.brand} ${car.model}`}
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute top-3 left-3">
+          <Badge 
+            className={`${
+              car.badge === 'Collector' 
+                ? 'bg-luxury-gold text-black' 
+                : 'bg-luxury-black text-white'
+            } font-medium`}
+          >
+            {car.badge}
+          </Badge>
+        </div>
+        <div className="absolute top-3 right-3 flex space-x-2">
+          <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
+            <Heart className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="absolute bottom-3 right-3 flex items-center space-x-1 bg-black/70 text-white px-2 py-1 rounded">
+          <Star className="h-3 w-3 fill-luxury-gold text-luxury-gold" />
+          <span className="text-xs font-medium">{car.rating}</span>
+        </div>
+      </div>
+      
+      <CardContent className="p-4">
+        <div className="mb-3">
+          <h3 className="font-bold text-lg text-luxury-black">
+            {car.brand} {car.model}
+          </h3>
+          <p className="text-luxury-gray text-sm">{car.year} • {car.location}</p>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2 mb-4 text-xs text-luxury-gray">
+          <div>
+            <span className="font-medium">Kilometerstand:</span>
+            <br />
+            {car.mileage.toLocaleString()} km
+          </div>
+          <div>
+            <span className="font-medium">Kraftstoff:</span>
+            <br />
+            {car.fuel}
+          </div>
+          <div>
+            <span className="font-medium">Leistung:</span>
+            <br />
+            {car.power}
+          </div>
+          <div>
+            <span className="font-medium">Verfügbar:</span>
+            <br />
+            Sofort
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-2xl font-bold text-luxury-black">
+              €{car.price.toLocaleString()}
+            </span>
+            <p className="text-xs text-luxury-gray">Festpreis</p>
+          </div>
+          <Button 
+            size="sm"
+            className="bg-luxury-black hover:bg-luxury-gold hover:text-black transition-all duration-300"
+            onClick={() => navigate(`/vehicle/${car.id}`)}
+          >
+            Details
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const FeaturedVehicles = () => {
   const navigate = useNavigate();
@@ -168,86 +257,7 @@ const FeaturedVehicles = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredCars.map((car) => (
-            <Card key={car.id} className="group hover:shadow-xl transition-all duration-300 border-0 overflow-hidden">
-              <div className="relative">
-                <img 
-                  src={car.image_url} 
-                  alt={`${car.brand} ${car.model}`}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute top-3 left-3">
-                  <Badge 
-                    className={`${
-                      car.badge === 'Collector' 
-                        ? 'bg-luxury-gold text-black' 
-                        : 'bg-luxury-black text-white'
-                    } font-medium`}
-                  >
-                    {car.badge}
-                  </Badge>
-                </div>
-                <div className="absolute top-3 right-3 flex space-x-2">
-                  <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="absolute bottom-3 right-3 flex items-center space-x-1 bg-black/70 text-white px-2 py-1 rounded">
-                  <Star className="h-3 w-3 fill-luxury-gold text-luxury-gold" />
-                  <span className="text-xs font-medium">{car.rating}</span>
-                </div>
-              </div>
-              
-              <CardContent className="p-4">
-                <div className="mb-3">
-                  <h3 className="font-bold text-lg text-luxury-black">
-                    {car.brand} {car.model}
-                  </h3>
-                  <p className="text-luxury-gray text-sm">{car.year} • {car.location}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-2 mb-4 text-xs text-luxury-gray">
-                  <div>
-                    <span className="font-medium">Kilometerstand:</span>
-                    <br />
-                    {car.mileage.toLocaleString()} km
-                  </div>
-                  <div>
-                    <span className="font-medium">Kraftstoff:</span>
-                    <br />
-                    {car.fuel}
-                  </div>
-                  <div>
-                    <span className="font-medium">Leistung:</span>
-                    <br />
-                    {car.power}
-                  </div>
-                  <div>
-                    <span className="font-medium">Verfügbar:</span>
-                    <br />
-                    Sofort
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-luxury-black">
-                      €{car.price.toLocaleString()}
-                    </span>
-                    <p className="text-xs text-luxury-gray">Festpreis</p>
-                  </div>
-                  <Button 
-                    size="sm"
-                    className="bg-luxury-black hover:bg-luxury-gold hover:text-black transition-all duration-300"
-                    onClick={() => navigate(`/vehicle/${car.id}`)}
-                  >
-                    Details
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <VehicleCard key={car.id} car={car} />
           ))}
         </div>
 

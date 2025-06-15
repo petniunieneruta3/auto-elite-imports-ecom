@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -9,6 +10,8 @@ import { ArrowLeft, Heart, Share2, Star, ShoppingCart, Phone, Mail, MapPin } fro
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { useVehicleImages } from '@/hooks/useVehicleImages';
+import VehicleImageGallery from '@/components/VehicleImageGallery';
 
 interface Vehicle {
   id: string;
@@ -36,6 +39,7 @@ const VehicleDetail = () => {
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { toast } = useToast();
+  const { images, primaryImage, loading: imagesLoading } = useVehicleImages(id);
 
   useEffect(() => {
     if (id) {
@@ -165,7 +169,7 @@ const VehicleDetail = () => {
         model: vehicle.model,
         year: vehicle.year,
         price: vehicle.price,
-        image_url: vehicle.image_url,
+        image_url: primaryImage || vehicle.image_url,
       });
       
       toast({
@@ -183,7 +187,7 @@ const VehicleDetail = () => {
     navigate('/contact');
   };
 
-  if (loading) {
+  if (loading || imagesLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -235,12 +239,11 @@ const VehicleDetail = () => {
         <section className="py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Image */}
+              {/* Image Gallery */}
               <div className="relative">
-                <img 
-                  src={vehicle.image_url} 
-                  alt={`${vehicle.brand} ${vehicle.model}`}
-                  className="w-full h-96 lg:h-full object-cover rounded-lg"
+                <VehicleImageGallery 
+                  images={images}
+                  vehicleName={`${vehicle.brand} ${vehicle.model}`}
                 />
                 <div className="absolute top-4 left-4">
                   <Badge 

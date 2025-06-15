@@ -11,6 +11,7 @@ import { Search, Filter, Heart, Eye, Star, Grid3X3, List, ShoppingCart } from 'l
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { useVehicleImages } from '@/hooks/useVehicleImages';
 
 interface Vehicle {
   id: string;
@@ -30,6 +31,148 @@ interface Vehicle {
   availability: string;
   description: string;
 }
+
+const VehicleCard = ({ vehicle, viewMode, onAddToCart, onViewDetails, onCompare }: {
+  vehicle: Vehicle;
+  viewMode: string;
+  onAddToCart: (vehicle: Vehicle) => void;
+  onViewDetails: (vehicleId: string) => void;
+  onCompare: (vehicle: Vehicle) => void;
+}) => {
+  const { primaryImage } = useVehicleImages(vehicle.id);
+
+  return (
+    <Card className={`group hover:shadow-xl transition-all duration-300 border-0 overflow-hidden ${
+      viewMode === 'list' ? 'flex' : ''
+    }`}>
+      <div className={`relative ${viewMode === 'list' ? 'w-64 flex-shrink-0' : ''}`}>
+        <img 
+          src={primaryImage || vehicle.image_url} 
+          alt={`${vehicle.brand} ${vehicle.model}`}
+          className={`object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer ${
+            viewMode === 'list' ? 'w-full h-full' : 'w-full h-48'
+          }`}
+          onClick={() => onViewDetails(vehicle.id)}
+        />
+        <div className="absolute top-3 left-3">
+          <Badge 
+            className={`${
+              vehicle.badge === 'Collector' 
+                ? 'bg-luxury-gold text-black'
+                : 'bg-luxury-black text-white'
+            } font-medium`}
+          >
+            {vehicle.badge}
+          </Badge>
+        </div>
+        <div className="absolute top-3 right-3 flex space-x-2">
+          <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
+            <Heart className="h-4 w-4" />
+          </Button>
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            className="h-8 w-8 bg-white/80 hover:bg-white"
+            onClick={() => onViewDetails(vehicle.id)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="absolute bottom-3 right-3 flex items-center space-x-1 bg-black/70 text-white px-2 py-1 rounded">
+          <Star className="h-3 w-3 fill-luxury-gold text-luxury-gold" />
+          <span className="text-xs font-medium">{vehicle.rating}</span>
+        </div>
+      </div>
+      
+      <CardContent className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+        <div className="mb-3">
+          <h3 
+            className="font-bold text-lg text-luxury-black cursor-pointer hover:text-luxury-gold transition-colors"
+            onClick={() => onViewDetails(vehicle.id)}
+          >
+            {vehicle.brand} {vehicle.model}
+          </h3>
+          <p className="text-luxury-gray text-sm">{vehicle.year} • {vehicle.location}</p>
+          <Badge 
+            variant="outline" 
+            className={`mt-1 text-xs ${
+              vehicle.availability === 'Sofort verfügbar' 
+                ? 'border-green-500 text-green-600' 
+                : 'border-orange-500 text-orange-600'
+            }`}
+          >
+            {vehicle.availability}
+          </Badge>
+        </div>
+        
+        <div className={`gap-2 mb-4 text-xs text-luxury-gray ${
+          viewMode === 'list' ? 'grid grid-cols-4' : 'grid grid-cols-2'
+        }`}>
+          <div>
+            <span className="font-medium">Kilometerstand:</span>
+            <br />
+            {vehicle.mileage.toLocaleString()} km
+          </div>
+          <div>
+            <span className="font-medium">Kraftstoff:</span>
+            <br />
+            {vehicle.fuel}
+          </div>
+          <div>
+            <span className="font-medium">Leistung:</span>
+            <br />
+            {vehicle.power}
+          </div>
+          <div>
+            <span className="font-medium">Getriebe:</span>
+            <br />
+            {vehicle.transmission}
+          </div>
+          {viewMode === 'list' && (
+            <div className="col-span-4">
+              <span className="font-medium">Farbe:</span> {vehicle.color}
+            </div>
+          )}
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-2xl font-bold text-luxury-black">
+              €{vehicle.price.toLocaleString()}
+            </span>
+            <p className="text-xs text-luxury-gray">Festpreis</p>
+          </div>
+          <div className="flex space-x-2">
+            <Button 
+              size="sm"
+              variant="outline"
+              className="border-luxury-black text-luxury-black hover:bg-luxury-black hover:text-white"
+              onClick={() => onCompare(vehicle)}
+            >
+              Vergleichen
+            </Button>
+            <Button 
+              size="sm"
+              onClick={() => onViewDetails(vehicle.id)}
+              variant="outline"
+              className="border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-black transition-all duration-300"
+            >
+              Détails
+            </Button>
+            <Button 
+              size="sm"
+              onClick={() => onAddToCart(vehicle)}
+              className="bg-luxury-gold hover:bg-luxury-dark-gold text-black transition-all duration-300"
+            >
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Panier
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const CatalogReal = () => {
   const navigate = useNavigate();
@@ -267,135 +410,14 @@ const CatalogReal = () => {
                 : "space-y-4"
             }>
               {filteredVehicles.map((vehicle) => (
-                <Card key={vehicle.id} className={`group hover:shadow-xl transition-all duration-300 border-0 overflow-hidden ${
-                  viewMode === 'list' ? 'flex' : ''
-                }`}>
-                  <div className={`relative ${viewMode === 'list' ? 'w-64 flex-shrink-0' : ''}`}>
-                    <img 
-                      src={vehicle.image_url} 
-                      alt={`${vehicle.brand} ${vehicle.model}`}
-                      className={`object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer ${
-                        viewMode === 'list' ? 'w-full h-full' : 'w-full h-48'
-                      }`}
-                      onClick={() => handleViewDetails(vehicle.id)}
-                    />
-                    <div className="absolute top-3 left-3">
-                      <Badge 
-                        className={`${
-                          vehicle.badge === 'Collector' 
-                            ? 'bg-luxury-gold text-black'
-                            : 'bg-luxury-black text-white'
-                        } font-medium`}
-                      >
-                        {vehicle.badge}
-                      </Badge>
-                    </div>
-                    <div className="absolute top-3 right-3 flex space-x-2">
-                      <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/80 hover:bg-white">
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="h-8 w-8 bg-white/80 hover:bg-white"
-                        onClick={() => handleViewDetails(vehicle.id)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="absolute bottom-3 right-3 flex items-center space-x-1 bg-black/70 text-white px-2 py-1 rounded">
-                      <Star className="h-3 w-3 fill-luxury-gold text-luxury-gold" />
-                      <span className="text-xs font-medium">{vehicle.rating}</span>
-                    </div>
-                  </div>
-                  
-                  <CardContent className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-                    <div className="mb-3">
-                      <h3 
-                        className="font-bold text-lg text-luxury-black cursor-pointer hover:text-luxury-gold transition-colors"
-                        onClick={() => handleViewDetails(vehicle.id)}
-                      >
-                        {vehicle.brand} {vehicle.model}
-                      </h3>
-                      <p className="text-luxury-gray text-sm">{vehicle.year} • {vehicle.location}</p>
-                      <Badge 
-                        variant="outline" 
-                        className={`mt-1 text-xs ${
-                          vehicle.availability === 'Sofort verfügbar' 
-                            ? 'border-green-500 text-green-600' 
-                            : 'border-orange-500 text-orange-600'
-                        }`}
-                      >
-                        {vehicle.availability}
-                      </Badge>
-                    </div>
-                    
-                    <div className={`gap-2 mb-4 text-xs text-luxury-gray ${
-                      viewMode === 'list' ? 'grid grid-cols-4' : 'grid grid-cols-2'
-                    }`}>
-                      <div>
-                        <span className="font-medium">Kilometerstand:</span>
-                        <br />
-                        {vehicle.mileage.toLocaleString()} km
-                      </div>
-                      <div>
-                        <span className="font-medium">Kraftstoff:</span>
-                        <br />
-                        {vehicle.fuel}
-                      </div>
-                      <div>
-                        <span className="font-medium">Leistung:</span>
-                        <br />
-                        {vehicle.power}
-                      </div>
-                      <div>
-                        <span className="font-medium">Getriebe:</span>
-                        <br />
-                        {vehicle.transmission}
-                      </div>
-                      {viewMode === 'list' && (
-                        <div className="col-span-4">
-                          <span className="font-medium">Farbe:</span> {vehicle.color}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-2xl font-bold text-luxury-black">
-                          €{vehicle.price.toLocaleString()}
-                        </span>
-                        <p className="text-xs text-luxury-gray">Festpreis</p>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button 
-                          size="sm"
-                          variant="outline"
-                          className="border-luxury-black text-luxury-black hover:bg-luxury-black hover:text-white"
-                          onClick={() => handleCompare(vehicle)}
-                        >
-                          Vergleichen
-                        </Button>
-                        <Button 
-                          size="sm"
-                          onClick={() => handleViewDetails(vehicle.id)}
-                          variant="outline"
-                          className="border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-black transition-all duration-300"
-                        >
-                          Détails
-                        </Button>
-                        <Button 
-                          size="sm"
-                          onClick={() => handleAddToCart(vehicle)}
-                          className="bg-luxury-gold hover:bg-luxury-dark-gold text-black transition-all duration-300"
-                        >
-                          <ShoppingCart className="h-4 w-4 mr-1" />
-                          Panier
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  viewMode={viewMode}
+                  onAddToCart={handleAddToCart}
+                  onViewDetails={handleViewDetails}
+                  onCompare={handleCompare}
+                />
               ))}
             </div>
           </div>
