@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -37,6 +37,7 @@ interface SimpleVehicleFormProps {
 const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     brand: vehicle?.brand || '',
     model: vehicle?.model || '',
@@ -58,16 +59,25 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
+
+    console.log('Submitting form:', { vehicle: !!vehicle, formData });
 
     try {
       if (vehicle) {
         // Update existing vehicle
-        const { error } = await supabase
+        console.log('Updating vehicle:', vehicle.id);
+        const { error: updateError } = await supabase
           .from('vehicles')
           .update(formData)
           .eq('id', vehicle.id);
 
-        if (error) throw error;
+        console.log('Update response:', updateError);
+
+        if (updateError) {
+          console.error('Update error:', updateError);
+          throw updateError;
+        }
 
         toast({
           title: "Véhicule modifié",
@@ -75,11 +85,17 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
         });
       } else {
         // Create new vehicle
-        const { error } = await supabase
+        console.log('Creating new vehicle');
+        const { error: insertError } = await supabase
           .from('vehicles')
           .insert([formData]);
 
-        if (error) throw error;
+        console.log('Insert response:', insertError);
+
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          throw insertError;
+        }
 
         toast({
           title: "Véhicule ajouté",
@@ -89,11 +105,14 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
 
       onClose();
     } catch (error) {
+      console.error('Form submission error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setError(errorMessage);
       toast({
         title: "Erreur",
         description: vehicle 
-          ? "Impossible de modifier le véhicule"
-          : "Impossible d'ajouter le véhicule",
+          ? `Impossible de modifier le véhicule: ${errorMessage}`
+          : `Impossible d'ajouter le véhicule: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
@@ -119,10 +138,17 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
           </div>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+              <span className="text-red-700">Erreur: {error}</span>
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="brand">Marque</Label>
+                <Label htmlFor="brand">Marque *</Label>
                 <Input
                   id="brand"
                   value={formData.brand}
@@ -131,7 +157,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="model">Modèle</Label>
+                <Label htmlFor="model">Modèle *</Label>
                 <Input
                   id="model"
                   value={formData.model}
@@ -140,33 +166,37 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="year">Année</Label>
+                <Label htmlFor="year">Année *</Label>
                 <Input
                   id="year"
                   type="number"
+                  min="1900"
+                  max="2030"
                   value={formData.year}
-                  onChange={(e) => handleChange('year', parseInt(e.target.value))}
+                  onChange={(e) => handleChange('year', parseInt(e.target.value) || new Date().getFullYear())}
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="price">Prix (€)</Label>
+                <Label htmlFor="price">Prix (€) *</Label>
                 <Input
                   id="price"
                   type="number"
+                  min="0"
                   step="0.01"
                   value={formData.price}
-                  onChange={(e) => handleChange('price', parseFloat(e.target.value))}
+                  onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)}
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="mileage">Kilométrage</Label>
+                <Label htmlFor="mileage">Kilométrage *</Label>
                 <Input
                   id="mileage"
                   type="number"
+                  min="0"
                   value={formData.mileage}
-                  onChange={(e) => handleChange('mileage', parseInt(e.target.value))}
+                  onChange={(e) => handleChange('mileage', parseInt(e.target.value) || 0)}
                   required
                 />
               </div>
@@ -185,7 +215,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="power">Puissance</Label>
+                <Label htmlFor="power">Puissance *</Label>
                 <Input
                   id="power"
                   value={formData.power}
@@ -209,7 +239,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="color">Couleur</Label>
+                <Label htmlFor="color">Couleur *</Label>
                 <Input
                   id="color"
                   value={formData.color}
@@ -238,7 +268,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                   min="1"
                   max="5"
                   value={formData.rating}
-                  onChange={(e) => handleChange('rating', parseFloat(e.target.value))}
+                  onChange={(e) => handleChange('rating', parseFloat(e.target.value) || 4.5)}
                 />
               </div>
               <div>
