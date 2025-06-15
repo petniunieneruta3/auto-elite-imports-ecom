@@ -9,6 +9,7 @@ import { useVehicleImages } from '@/hooks/useVehicleImages';
 import { addMercedesCLA } from '@/utils/addMercedesCLA';
 import { addVolvoXC60 } from '@/utils/addVolvoXC60';
 import { addVolvoV90 } from '@/utils/addVolvoV90';
+import { addRenaultCaptur } from '@/utils/addRenaultCaptur';
 
 interface Vehicle {
   id: string;
@@ -101,6 +102,7 @@ const FeaturedVehicles = () => {
       await addMercedesCLA();
       await addVolvoXC60();
       await addVolvoV90();
+      await addRenaultCaptur();
       fetchFeaturedVehicles();
     };
     
