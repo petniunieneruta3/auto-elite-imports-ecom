@@ -23,6 +23,7 @@ import { addMercedesGLA45SAMG } from '@/utils/addMercedesGLA45SAMG';
 import { addCitroenC4 } from '@/utils/addCitroenC4';
 import { addVolkswagenGolfRLine } from '@/utils/addVolkswagenGolfRLine';
 import { addPorscheCayenneCoupe } from '@/utils/addPorscheCayenneCoupe';
+import { addAudiA3Sportback } from '@/utils/addAudiA3Sportback';
 
 interface Vehicle {
   id: string;
@@ -68,6 +69,7 @@ const FeaturedVehicles = () => {
       await addCitroenC4();
       await addVolkswagenGolfRLine();
       await addPorscheCayenneCoupe();
+      await addAudiA3Sportback();
       fetchFeaturedVehicles();
     };
     
