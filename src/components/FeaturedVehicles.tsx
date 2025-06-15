@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useVehicleImages } from '@/hooks/useVehicleImages';
 import { addMercedesCLA } from '@/utils/addMercedesCLA';
+import { addMercedesCLA200d } from '@/utils/addMercedesCLA200d';
 import { addVolvoXC60 } from '@/utils/addVolvoXC60';
 import { addVolvoV90 } from '@/utils/addVolvoV90';
 import { addRenaultCaptur } from '@/utils/addRenaultCaptur';
@@ -103,6 +103,7 @@ const FeaturedVehicles = () => {
     // Add vehicles if they don't exist, then fetch vehicles
     const initializeVehicles = async () => {
       await addMercedesCLA();
+      await addMercedesCLA200d();
       await addVolvoXC60();
       await addVolvoV90();
       await addRenaultCaptur();
@@ -180,4 +181,3 @@ const FeaturedVehicles = () => {
 };
 
 export default FeaturedVehicles;
-
