@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +12,7 @@ import { addVolvoXC60 } from '@/utils/addVolvoXC60';
 import { addVolvoV90 } from '@/utils/addVolvoV90';
 import { addRenaultCaptur } from '@/utils/addRenaultCaptur';
 import { addRenaultArkana } from '@/utils/addRenaultArkana';
+import { addAudiQ8 } from '@/utils/addAudiQ8';
 
 interface Vehicle {
   id: string;
@@ -108,6 +108,7 @@ const FeaturedVehicles = () => {
       await addVolvoV90();
       await addRenaultCaptur();
       await addRenaultArkana();
+      await addAudiQ8();
       fetchFeaturedVehicles();
     };
     
