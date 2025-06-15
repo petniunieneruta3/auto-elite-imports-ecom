@@ -37,6 +37,7 @@ const SimpleAdmin = () => {
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [refreshLoading, setRefreshLoading] = useState(false);
 
   useEffect(() => {
     fetchVehicles();
@@ -74,6 +75,17 @@ const SimpleAdmin = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    console.log('Manual refresh triggered');
+    setRefreshLoading(true);
+    await fetchVehicles();
+    setRefreshLoading(false);
+    toast({
+      title: "Liste actualisée",
+      description: "La liste des véhicules a été mise à jour",
+    });
   };
 
   const handleDelete = async (id: string) => {
@@ -124,11 +136,6 @@ const SimpleAdmin = () => {
         description: `${existingVehicle.brand} ${existingVehicle.model} a été supprimé avec succès`,
       });
 
-      // Refresh the list to ensure consistency
-      setTimeout(() => {
-        fetchVehicles();
-      }, 500);
-
     } catch (error) {
       console.error('Error during deletion:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
@@ -137,25 +144,36 @@ const SimpleAdmin = () => {
         description: errorMessage,
         variant: "destructive",
       });
-      
-      // Refresh the list to show current state
-      fetchVehicles();
     } finally {
       setDeleteLoading(null);
     }
   };
 
   const handleEdit = (vehicle: Vehicle) => {
-    console.log('Editing vehicle:', vehicle);
+    console.log('Edit button clicked for vehicle:', vehicle.id, vehicle.brand, vehicle.model);
     setEditingVehicle(vehicle);
     setShowForm(true);
+    toast({
+      title: "Mode modification",
+      description: `Modification de ${vehicle.brand} ${vehicle.model}`,
+    });
+  };
+
+  const handleAddNew = () => {
+    console.log('Add new vehicle button clicked');
+    setEditingVehicle(null);
+    setShowForm(true);
+    toast({
+      title: "Nouveau véhicule",
+      description: "Formulaire d'ajout d'un nouveau véhicule ouvert",
+    });
   };
 
   const handleFormClose = () => {
     console.log('Form closed, refreshing vehicles...');
     setShowForm(false);
     setEditingVehicle(null);
-    // Always refresh after form closes
+    // Always refresh after form closes to ensure data consistency
     fetchVehicles();
   };
 
@@ -190,10 +208,15 @@ const SimpleAdmin = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={fetchVehicles}
+                  onClick={handleRefresh}
+                  disabled={refreshLoading}
                   className="ml-auto"
                 >
-                  Réessayer
+                  {refreshLoading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
+                  ) : (
+                    'Réessayer'
+                  )}
                 </Button>
               </div>
             )}
@@ -211,14 +234,14 @@ const SimpleAdmin = () => {
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
-                    onClick={fetchVehicles}
-                    disabled={loading}
+                    onClick={handleRefresh}
+                    disabled={refreshLoading}
                   >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-4 w-4 mr-2 ${refreshLoading ? 'animate-spin' : ''}`} />
                     Actualiser
                   </Button>
                   <Button
-                    onClick={() => setShowForm(true)}
+                    onClick={handleAddNew}
                     className="bg-luxury-gold hover:bg-luxury-dark-gold text-black"
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -232,7 +255,7 @@ const SimpleAdmin = () => {
                 <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">Aucun véhicule trouvé</p>
                   <Button
-                    onClick={() => setShowForm(true)}
+                    onClick={handleAddNew}
                     className="bg-luxury-gold hover:bg-luxury-dark-gold text-black"
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -298,6 +321,7 @@ const SimpleAdmin = () => {
                                 variant="outline"
                                 onClick={() => handleEdit(vehicle)}
                                 disabled={deleteLoading === vehicle.id}
+                                className="hover:bg-blue-50 hover:border-blue-200"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>

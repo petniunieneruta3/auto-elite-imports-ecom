@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,25 +58,29 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submission started:', { 
+      isUpdate: !!vehicle, 
+      vehicleId: vehicle?.id,
+      formData 
+    });
+    
     // Basic validation
     if (!formData.brand.trim() || !formData.model.trim() || !formData.power.trim() || !formData.color.trim()) {
-      setError('Veuillez remplir tous les champs obligatoires (marque, modèle, puissance, couleur)');
+      const errorMsg = 'Veuillez remplir tous les champs obligatoires (marque, modèle, puissance, couleur)';
+      setError(errorMsg);
+      console.error('Validation error:', errorMsg);
       return;
     }
 
     if (formData.price <= 0 || formData.mileage < 0 || formData.year < 1900 || formData.year > 2030) {
-      setError('Veuillez vérifier les valeurs numériques (prix > 0, kilométrage >= 0, année valide)');
+      const errorMsg = 'Veuillez vérifier les valeurs numériques (prix > 0, kilométrage >= 0, année valide)';
+      setError(errorMsg);
+      console.error('Validation error:', errorMsg);
       return;
     }
 
     setLoading(true);
     setError(null);
-
-    console.log('Submitting form:', { 
-      isUpdate: !!vehicle, 
-      vehicleId: vehicle?.id,
-      formData 
-    });
 
     try {
       if (vehicle) {
@@ -97,6 +100,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
           throw new Error(updateError.message);
         }
 
+        console.log('Vehicle updated successfully');
         toast({
           title: "Véhicule modifié",
           description: `${formData.brand} ${formData.model} a été modifié avec succès`,
@@ -117,6 +121,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
           throw new Error(insertError.message);
         }
 
+        console.log('Vehicle created successfully');
         toast({
           title: "Véhicule ajouté",
           description: `${formData.brand} ${formData.model} a été ajouté avec succès`,
@@ -124,6 +129,7 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
       }
 
       // Close form after successful operation
+      console.log('Form operation successful, closing form');
       onClose();
     } catch (error) {
       console.error('Form submission error:', error);
@@ -142,9 +148,15 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
   };
 
   const handleChange = (field: string, value: any) => {
+    console.log('Form field changed:', field, value);
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (error) setError(null);
+  };
+
+  const handleClose = () => {
+    console.log('Form close button clicked');
+    onClose();
   };
 
   return (
@@ -155,7 +167,12 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
             <CardTitle>
               {vehicle ? 'Modifier le véhicule' : 'Ajouter un véhicule'}
             </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleClose}
+              className="hover:bg-gray-100"
+            >
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -337,7 +354,12 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
             </div>
 
             <div className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleClose}
+                disabled={loading}
+              >
                 Annuler
               </Button>
               <Button
@@ -346,8 +368,8 @@ const SimpleVehicleForm = ({ vehicle, onClose }: SimpleVehicleFormProps) => {
                 disabled={loading}
               >
                 {loading 
-                  ? 'Enregistrement...' 
-                  : vehicle ? 'Modifier' : 'Ajouter'
+                  ? (vehicle ? 'Modification...' : 'Ajout...') 
+                  : (vehicle ? 'Modifier' : 'Ajouter')
                 }
               </Button>
             </div>
