@@ -14,11 +14,6 @@ const PurchaseProcedure = () => {
         </div>
         
         <Card className="border-2 border-luxury-gold max-w-4xl mx-auto">
-          <CardHeader className="text-center bg-luxury-gold">
-            <CardTitle className="text-luxury-black text-xl">
-              🇩🇪 Deutschland
-            </CardTitle>
-          </CardHeader>
           <CardContent className="p-6 space-y-6">
             <div className="flex items-start space-x-3">
               <CreditCard className="h-6 w-6 text-luxury-gold mt-1 flex-shrink-0" />
