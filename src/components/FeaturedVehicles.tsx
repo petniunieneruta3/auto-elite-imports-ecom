@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useVehicleImages } from '@/hooks/useVehicleImages';
 import { addMercedesCLA } from '@/utils/addMercedesCLA';
 import { addVolvoXC60 } from '@/utils/addVolvoXC60';
+import { addVolvoV90 } from '@/utils/addVolvoV90';
 
 interface Vehicle {
   id: string;
@@ -99,6 +100,7 @@ const FeaturedVehicles = () => {
     const initializeVehicles = async () => {
       await addMercedesCLA();
       await addVolvoXC60();
+      await addVolvoV90();
       fetchFeaturedVehicles();
     };
     
