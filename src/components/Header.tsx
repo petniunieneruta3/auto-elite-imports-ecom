@@ -136,7 +136,7 @@ const Header = () => {
               </Button>
               <Button 
                 onClick={() => navigate('/contact')}
-                className="bg-luxury-gold hover:bg-luxury-dark-gold text-black font-semibold px-6 py-2 transition-all duration-300"
+                className="bg-luxury-gold hover:bg-luxury-dark-gold text-luxury-black font-semibold px-6 py-2 transition-all duration-300 border-2 border-luxury-gold hover:border-luxury-dark-gold"
               >
                 Beratung anfordern
               </Button>
@@ -229,7 +229,7 @@ const Header = () => {
                   navigate('/contact');
                   setIsMenuOpen(false);
                 }}
-                className="w-full bg-luxury-gold hover:bg-luxury-dark-gold text-black font-semibold mt-4"
+                className="w-full bg-luxury-gold hover:bg-luxury-dark-gold text-luxury-black font-semibold mt-4 border-2 border-luxury-gold hover:border-luxury-dark-gold"
               >
                 Beratung anfordern
               </Button>
