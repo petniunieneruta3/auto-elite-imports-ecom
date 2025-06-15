@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +7,6 @@ import { Heart, Eye, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useVehicleImages } from '@/hooks/useVehicleImages';
-import { addMercedesGLCIfNotExists } from '@/utils/addVehicleOnLoad';
 
 interface Vehicle {
   id: string;
@@ -117,15 +117,10 @@ const FeaturedVehicles = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('FeaturedVehicles: Component mounted, adding Mercedes GLC and fetching vehicles...');
+    console.log('FeaturedVehicles: Component mounted, fetching vehicles...');
     
-    // Add Mercedes GLC if it doesn't exist, then fetch vehicles
-    const initializeVehicles = async () => {
-      await addMercedesGLCIfNotExists();
-      fetchFeaturedVehicles();
-    };
-    
-    initializeVehicles();
+    // Fetch vehicles directly without adding any
+    fetchFeaturedVehicles();
     
     // Set up real-time subscription for vehicle changes
     console.log('FeaturedVehicles: Setting up real-time subscription...');
