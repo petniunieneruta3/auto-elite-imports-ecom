@@ -28,6 +28,7 @@ import { addFordMondeoHybrid } from '@/utils/addFordMondeoHybrid';
 import { addRangeRoverEvoque } from '@/utils/addRangeRoverEvoque';
 import { addMercedesA180d } from '@/utils/addMercedesA180d';
 import { addRangeRoverEvoqueRDynamic } from '@/utils/addRangeRoverEvoqueRDynamic';
+import { addBMWX2MSport } from '@/utils/addBMWX2MSport';
 
 interface Vehicle {
   id: string;
@@ -78,6 +79,7 @@ const FeaturedVehicles = () => {
       await addRangeRoverEvoque();
       await addMercedesA180d();
       await addRangeRoverEvoqueRDynamic();
+      await addBMWX2MSport();
       fetchFeaturedVehicles();
     };
     
