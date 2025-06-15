@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useVehicleImages } from '@/hooks/useVehicleImages';
 import { addMercedesCLA } from '@/utils/addMercedesCLA';
+import { addVolvoXC60 } from '@/utils/addVolvoXC60';
 
 interface Vehicle {
   id: string;
@@ -92,11 +93,12 @@ const FeaturedVehicles = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('FeaturedVehicles: Component mounted, adding Mercedes CLA and fetching vehicles...');
+    console.log('FeaturedVehicles: Component mounted, adding vehicles and fetching...');
     
-    // Add Mercedes CLA if it doesn't exist, then fetch vehicles
+    // Add vehicles if they don't exist, then fetch vehicles
     const initializeVehicles = async () => {
       await addMercedesCLA();
+      await addVolvoXC60();
       fetchFeaturedVehicles();
     };
     
