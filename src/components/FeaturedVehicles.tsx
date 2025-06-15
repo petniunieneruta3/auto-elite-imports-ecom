@@ -31,6 +31,7 @@ import { addMercedesA180d } from '@/utils/addMercedesA180d';
 import { addRangeRoverEvoqueRDynamic } from '@/utils/addRangeRoverEvoqueRDynamic';
 import { addBMWX2MSport } from '@/utils/addBMWX2MSport';
 import { addBMWX1MSport } from '@/utils/addBMWX1MSport';
+import { addAudiA5Gtron } from '@/utils/addAudiA5Gtron';
 
 interface Vehicle {
   id: string;
@@ -87,7 +88,8 @@ const FeaturedVehicles = () => {
         addMercedesA180d(),
         addRangeRoverEvoqueRDynamic(),
         addBMWX2MSport(),
-        addBMWX1MSport()
+        addBMWX1MSport(),
+        addAudiA5Gtron()
       ];
 
       // Execute all vehicle additions in parallel
