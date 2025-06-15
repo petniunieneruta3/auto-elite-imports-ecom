@@ -18,6 +18,7 @@ import { addMercedesGLC43AMG } from '@/utils/addMercedesGLC43AMG';
 import { addMercedesGLE350d } from '@/utils/addMercedesGLE350d';
 import { addVolkswagenGolfGTE } from '@/utils/addVolkswagenGolfGTE';
 import { addBMWX3 } from '@/utils/addBMWX3';
+import { addBMWX4 } from '@/utils/addBMWX4';
 
 interface Vehicle {
   id: string;
@@ -57,6 +58,7 @@ const FeaturedVehicles = () => {
       await addMercedesGLE350d();
       await addVolkswagenGolfGTE();
       await addBMWX3();
+      await addBMWX4();
       fetchFeaturedVehicles();
     };
     
