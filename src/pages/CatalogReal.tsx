@@ -44,9 +44,11 @@ const CatalogReal = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('CatalogReal: Component mounted, fetching vehicles...');
     fetchVehicles();
     
     // Set up real-time subscription for vehicle changes
+    console.log('CatalogReal: Setting up real-time subscription...');
     const channel = supabase
       .channel('catalog-vehicles-changes')
       .on(
@@ -57,29 +59,39 @@ const CatalogReal = () => {
           table: 'vehicles'
         },
         (payload) => {
-          console.log('Vehicle change detected in catalog:', payload);
+          console.log('CatalogReal: Vehicle change detected:', payload);
+          console.log('CatalogReal: Refreshing vehicles list...');
           // Refresh the vehicles list when any change occurs
           fetchVehicles();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('CatalogReal: Subscription status:', status);
+      });
 
     return () => {
+      console.log('CatalogReal: Cleaning up subscription...');
       supabase.removeChannel(channel);
     };
   }, []);
 
   const fetchVehicles = async () => {
+    console.log('CatalogReal: Starting fetchVehicles...');
     try {
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('CatalogReal: Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('CatalogReal: Fetched vehicles:', data?.length || 0, 'vehicles');
       setVehicles(data || []);
     } catch (error) {
-      console.error('Error fetching vehicles:', error);
+      console.error('CatalogReal: Error fetching vehicles:', error);
     } finally {
       setLoading(false);
     }

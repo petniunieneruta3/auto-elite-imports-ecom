@@ -27,9 +27,11 @@ const FeaturedVehicles = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('FeaturedVehicles: Component mounted, fetching vehicles...');
     fetchFeaturedVehicles();
     
     // Set up real-time subscription for vehicle changes
+    console.log('FeaturedVehicles: Setting up real-time subscription...');
     const channel = supabase
       .channel('vehicles-changes')
       .on(
@@ -40,19 +42,24 @@ const FeaturedVehicles = () => {
           table: 'vehicles'
         },
         (payload) => {
-          console.log('Vehicle change detected:', payload);
+          console.log('FeaturedVehicles: Vehicle change detected:', payload);
+          console.log('FeaturedVehicles: Refreshing vehicles list...');
           // Refresh the vehicles list when any change occurs
           fetchFeaturedVehicles();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('FeaturedVehicles: Subscription status:', status);
+      });
 
     return () => {
+      console.log('FeaturedVehicles: Cleaning up subscription...');
       supabase.removeChannel(channel);
     };
   }, []);
 
   const fetchFeaturedVehicles = async () => {
+    console.log('FeaturedVehicles: Starting fetchFeaturedVehicles...');
     try {
       const { data, error } = await supabase
         .from('vehicles')
@@ -60,10 +67,15 @@ const FeaturedVehicles = () => {
         .limit(4)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('FeaturedVehicles: Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('FeaturedVehicles: Fetched vehicles:', data?.length || 0, 'vehicles');
       setFeaturedCars(data || []);
     } catch (error) {
-      console.error('Error fetching featured vehicles:', error);
+      console.error('FeaturedVehicles: Error fetching vehicles:', error);
       // Fallback data if database fetch fails
       setFeaturedCars([
         {
