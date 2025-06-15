@@ -35,6 +35,7 @@ import { addAudiA5Gtron } from '@/utils/addAudiA5Gtron';
 import { addBMWM340d } from '@/utils/addBMWM340d';
 import { addVolkswagenGolfGTITCR } from '@/utils/addVolkswagenGolfGTITCR';
 import { addVolkswagenGolfGTI2021 } from '@/utils/addVolkswagenGolfGTI2021';
+import { addAudiS7Sportback } from '@/utils/addAudiS7Sportback';
 
 interface Vehicle {
   id: string;
@@ -96,7 +97,8 @@ const FeaturedVehicles = () => {
         addAudiA5Gtron(),
         addBMWM340d(),
         addVolkswagenGolfGTITCR(),
-        addVolkswagenGolfGTI2021()
+        addVolkswagenGolfGTI2021(),
+        addAudiS7Sportback()
       ];
 
       // Execute all vehicle additions in parallel
