@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -134,7 +135,8 @@ const FeaturedVehicles = () => {
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
-        .limit(4);
+        .order('created_at', { ascending: false })
+        .limit(8);
 
       if (error) {
         console.error('FeaturedVehicles: Error fetching vehicles:', error);
