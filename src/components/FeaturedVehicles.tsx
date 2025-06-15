@@ -4,6 +4,7 @@ import VehicleGrid from './VehicleGrid';
 import { addMercedesCLA } from '@/utils/addMercedesCLA';
 import { addMercedesCLA200d } from '@/utils/addMercedesCLA200d';
 import { addMercedesCLA200AMG } from '@/utils/addMercedesCLA200AMG';
+import { addMercedesCLA200AMGLine } from '@/utils/addMercedesCLA200AMGLine';
 import { addVolvoXC60 } from '@/utils/addVolvoXC60';
 import { addVolvoV90 } from '@/utils/addVolvoV90';
 import { addRenaultCaptur } from '@/utils/addRenaultCaptur';
@@ -45,6 +46,7 @@ const FeaturedVehicles = () => {
       await addMercedesCLA();
       await addMercedesCLA200d();
       await addMercedesCLA200AMG();
+      await addMercedesCLA200AMGLine();
       await addVolvoXC60();
       await addVolvoV90();
       await addRenaultCaptur();
