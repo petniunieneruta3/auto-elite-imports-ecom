@@ -103,7 +103,7 @@ const Privacy = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>6. Ihre Rechte</CardTitle>
+                  <Car/CardTitle>6. Ihre Rechte</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p>Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:</p>
