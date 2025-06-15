@@ -31,7 +31,6 @@ import { addMercedesA180d } from '@/utils/addMercedesA180d';
 import { addRangeRoverEvoqueRDynamic } from '@/utils/addRangeRoverEvoqueRDynamic';
 import { addBMWX2MSport } from '@/utils/addBMWX2MSport';
 import { addBMWX1MSport } from '@/utils/addBMWX1MSport';
-import { addAudiA5Gtron } from '@/utils/addAudiA5Gtron';
 
 interface Vehicle {
   id: string;
@@ -55,37 +54,47 @@ const FeaturedVehicles = () => {
     
     // Add vehicles if they don't exist, then fetch vehicles
     const initializeVehicles = async () => {
-      await addMercedesCLA();
-      await addMercedesCLA200d();
-      await addMercedesCLA200AMG();
-      await addMercedesCLA200AMGLine();
-      await addVolvoXC60();
-      await addVolvoV90();
-      await addRenaultCaptur();
-      await addRenaultArkana();
-      await addAudiQ8();
-      await addAudiQ3();
-      await addMercedesGLEAMG53();
-      await addFordMustang();
-      await addMercedesG63AMG();
-      await addMercedesGLC43AMG();
-      await addMercedesGLE350d();
-      await addVolkswagenGolfGTE();
-      await addBMWX3();
-      await addBMWX4();
-      await addMercedesGLA45SAMG();
-      await addCitroenC4();
-      await addVolkswagenGolfRLine();
-      await addPorscheCayenneCoupe();
-      await addAudiA3Sportback();
-      await addFordMondeoHybrid();
-      await addRangeRoverEvoque();
-      await addMercedesA180d();
-      await addRangeRoverEvoqueRDynamic();
-      await addBMWX2MSport();
-      await addBMWX1MSport();
-      await addAudiA5Gtron();
-      fetchFeaturedVehicles();
+      // Fetch existing vehicles first to show them immediately
+      await fetchFeaturedVehicles();
+      
+      // Then add missing vehicles in parallel in the background
+      const addVehiclePromises = [
+        addMercedesCLA(),
+        addMercedesCLA200d(),
+        addMercedesCLA200AMG(),
+        addMercedesCLA200AMGLine(),
+        addVolvoXC60(),
+        addVolvoV90(),
+        addRenaultCaptur(),
+        addRenaultArkana(),
+        addAudiQ8(),
+        addAudiQ3(),
+        addMercedesGLEAMG53(),
+        addFordMustang(),
+        addMercedesG63AMG(),
+        addMercedesGLC43AMG(),
+        addMercedesGLE350d(),
+        addVolkswagenGolfGTE(),
+        addBMWX3(),
+        addBMWX4(),
+        addMercedesGLA45SAMG(),
+        addCitroenC4(),
+        addVolkswagenGolfRLine(),
+        addPorscheCayenneCoupe(),
+        addAudiA3Sportback(),
+        addFordMondeoHybrid(),
+        addRangeRoverEvoque(),
+        addMercedesA180d(),
+        addRangeRoverEvoqueRDynamic(),
+        addBMWX2MSport(),
+        addBMWX1MSport()
+      ];
+
+      // Execute all vehicle additions in parallel
+      await Promise.all(addVehiclePromises);
+      
+      // Fetch vehicles again after all additions are complete
+      await fetchFeaturedVehicles();
     };
     
     initializeVehicles();
