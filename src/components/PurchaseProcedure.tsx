@@ -16,7 +16,7 @@ const PurchaseProcedure = () => {
         <Card className="border-2 border-luxury-gold max-w-4xl mx-auto">
           <CardHeader className="text-center bg-luxury-gold">
             <CardTitle className="text-luxury-black text-xl">
-              🇩🇪 Kaufverfahren für Fahrzeuge
+              🇩🇪 Deutschland
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
