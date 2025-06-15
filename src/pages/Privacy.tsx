@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -103,7 +102,7 @@ const Privacy = () => {
 
               <Card>
                 <CardHeader>
-                  <Car/CardTitle>6. Ihre Rechte</CardTitle>
+                  <CardTitle>6. Ihre Rechte</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p>Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:</p>
