@@ -165,7 +165,7 @@ const FeaturedVehicles = () => {
   }, [vehicles, showCount]);
 
   const handleShowMore = () => {
-    setShowCount(prev => prev + 8); // Show 8 more vehicles each time
+    setShowCount(50); // Show all 50 vehicles when clicked
   };
 
   if (loading) {
