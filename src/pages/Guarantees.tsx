@@ -3,120 +3,142 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LanguageSelector from '@/components/LanguageSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Shield, CheckCircle, Clock, FileText } from 'lucide-react';
 
 const Guarantees = () => {
-  const guaranteeTypes = [
-    {
-      icon: <Shield className="h-8 w-8 text-sky-500" />,
-      title: "Motorgarantie",
-      duration: "12 Monate",
-      description: "Vollständige Abdeckung aller Motorkomponenten gegen Defekte"
-    },
-    {
-      icon: <CheckCircle className="h-8 w-8 text-sky-500" />,
-      title: "Getriebe & Antrieb",
-      duration: "12 Monate", 
-      description: "Schutz für Getriebe, Kupplung und Antriebskomponenten"
-    },
-    {
-      icon: <Clock className="h-8 w-8 text-sky-500" />,
-      title: "Elektronik",
-      duration: "6 Monate",
-      description: "Garantie auf elektronische Systeme und Steuergeräte"
-    },
-    {
-      icon: <FileText className="h-8 w-8 text-sky-500" />,
-      title: "Karosserie",
-      duration: "6 Monate",
-      description: "Schutz vor versteckten Karosserieschäden"
-    }
-  ];
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main className="pt-20">
-        {/* Hero Section */}
         <section className="bg-luxury-black text-white py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Garantien & Gewährleistung
+              Unsere Garantien
             </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Ihr Schutz und unsere Qualitätsversprechen
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Wir bieten umfassende Garantien, damit Sie mit Vertrauen und Sicherheit kaufen können.
             </p>
           </div>
         </section>
 
-        {/* Guarantee Types */}
-        <section className="py-16">
+        <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {guaranteeTypes.map((guarantee, index) => (
-                <Card key={index} className="text-center">
-                  <CardHeader>
-                    <div className="flex justify-center mb-4">
-                      {guarantee.icon}
-                    </div>
-                    <CardTitle className="text-lg">{guarantee.title}</CardTitle>
-                    <p className="text-sky-500 font-semibold">{guarantee.duration}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">{guarantee.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Garantiekarte 1 */}
+              <Card className="shadow-lg border-0">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-2xl font-bold">
+                    <Shield className="mr-2 h-6 w-6 text-luxury-gold inline-block align-middle" />
+                    Umfassende Garantie
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Unsere umfassende Garantie deckt Material- und Herstellungsfehler für bis zu 24 Monate ab Kaufdatum ab.
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 mb-4">
+                    <li>Motor und Getriebe</li>
+                    <li>Elektrische Komponenten</li>
+                    <li>Klimaanlage</li>
+                    <li>Bremsanlage</li>
+                  </ul>
+                  <Badge className="bg-green-100 text-green-800 font-semibold py-1 px-2 rounded-full">
+                    <CheckCircle className="mr-1 h-4 w-4 inline-block align-middle" />
+                    Inklusive
+                  </Badge>
+                </CardContent>
+              </Card>
+
+              {/* Garantiekarte 2 */}
+              <Card className="shadow-lg border-0">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-2xl font-bold">
+                    <Clock className="mr-2 h-6 w-6 text-luxury-gold inline-block align-middle" />
+                    Schnelle Reparatur
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Im Garantiefall garantieren wir eine schnelle und effiziente Reparatur, um Ihre Ausfallzeiten zu minimieren.
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 mb-4">
+                    <li>Bevorzugte Terminplanung</li>
+                    <li>Express-Service</li>
+                    <li>Qualifizierte Techniker</li>
+                  </ul>
+                  <Badge className="bg-blue-100 text-blue-800 font-semibold py-1 px-2 rounded-full">
+                    <CheckCircle className="mr-1 h-4 w-4 inline-block align-middle" />
+                    Schnelle Bearbeitung
+                  </Badge>
+                </CardContent>
+              </Card>
+
+              {/* Garantiekarte 3 */}
+              <Card className="shadow-lg border-0">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-2xl font-bold">
+                    <FileText className="mr-2 h-6 w-6 text-luxury-gold inline-block align-middle" />
+                    Transparente Bedingungen
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Unsere Garantiebedingungen sind klar und verständlich, ohne versteckte Klauseln oder unerwartete Kosten.
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 mb-4">
+                    <li>Einfache Antragsstellung</li>
+                    <li>Detaillierte Dokumentation</li>
+                    <li>Persönliche Beratung</li>
+                  </ul>
+                  <Badge className="bg-purple-100 text-purple-800 font-semibold py-1 px-2 rounded-full">
+                    <CheckCircle className="mr-1 h-4 w-4 inline-block align-middle" />
+                    Klar und deutlich
+                  </Badge>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* Terms & Conditions */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-12">Garantiebedingungen</h2>
-            
-            <div className="space-y-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Geltungsbereich</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p>Unsere Garantie gilt für alle von uns verkauften Gebrauchtwagen ab dem Kaufdatum.</p>
-                  <p>Die Garantie deckt unvorhergesehene Defekte an den versicherten Komponenten ab.</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ausschlüsse</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p>Von der Garantie ausgeschlossen sind:</p>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Verschleißteile (Bremsen, Reifen, Batterien)</li>
-                    <li>Schäden durch unsachgemäße Behandlung</li>
-                    <li>Schäden durch Unfälle oder höhere Gewalt</li>
-                    <li>Kosmetische Mängel</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Geltendmachung</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p>Im Garantiefall kontaktieren Sie uns unverzüglich:</p>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Telefon: +33774 072351</li>
-                    <li>E-Mail: autoexport49@gmail.com</li>
-                    <li>Reparaturen nur in autorisierten Werkstätten</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle className="text-3xl font-bold text-center">
+                  Häufig gestellte Fragen
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-gray-700">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-2">
+                    Was deckt die Garantie ab?
+                  </h3>
+                  <p>
+                    Unsere Garantie deckt Material- und Herstellungsfehler an Ihrem Fahrzeug ab.
+                    Ausgenommen sind Verschleißteile und Schäden durch unsachgemäße Behandlung.
+                  </p>
+                </div>
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-2">
+                    Wie lange ist die Garantie gültig?
+                  </h3>
+                  <p>
+                    Die Garantie ist für 12 oder 24 Monate gültig, abhängig von der gewählten Option.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    Wie kann ich einen Garantieanspruch geltend machen?
+                  </h3>
+                  <p>
+                    Im Garantiefall kontaktieren Sie bitte unseren Kundenservice. Wir werden den
+                    weiteren Ablauf mit Ihnen abstimmen.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
       </main>

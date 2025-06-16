@@ -1,53 +1,34 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LanguageSelector from '@/components/LanguageSelector';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calculator, CreditCard, TrendingUp, Shield, CheckCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { Calculator, CreditCard, FileText, CheckCircle, Euro, Percent } from 'lucide-react';
 
 const Financing = () => {
-  const [loanAmount, setLoanAmount] = useState(50000);
+  const [vehiclePrice, setVehiclePrice] = useState(30000);
+  const [downPayment, setDownPayment] = useState(5000);
+  const [interestRate, setInterestRate] = useState(5);
   const [loanTerm, setLoanTerm] = useState(60);
-  const [interestRate] = useState(0);
 
   const calculateMonthlyPayment = () => {
-    if (interestRate === 0) {
-      return (loanAmount / loanTerm).toFixed(2);
-    }
-    const monthlyRate = interestRate / 100 / 12;
-    const numPayments = loanTerm;
-    const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
-                          (Math.pow(1 + monthlyRate, numPayments) - 1);
-    return monthlyPayment.toFixed(2);
+    const principal = vehiclePrice - downPayment;
+    const monthlyInterestRate = interestRate / 100 / 12;
+    const numberOfPayments = loanTerm;
+
+    const monthlyPayment =
+      (principal * monthlyInterestRate) /
+      (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+
+    return monthlyPayment ? monthlyPayment.toFixed(2) : '0.00';
   };
 
-  const financingOptions = [
-    {
-      icon: <CreditCard className="h-8 w-8 text-luxury-gold" />,
-      title: "Klassischer Autokredit",
-      description: "0% Zinsen für alle Kunden",
-      features: ["Laufzeit: 12-84 Monate", "Anzahlung ab 10%", "Schnelle Bearbeitung"]
-    },
-    {
-      icon: <TrendingUp className="h-8 w-8 text-luxury-gold" />,
-      title: "Leasing",
-      description: "Flexible Leasinglösungen für Privat und Gewerbe",
-      features: ["Niedrige Monatsraten", "Wartung inkl.", "Rückgabe möglich"]
-    },
-    {
-      icon: <Shield className="h-8 w-8 text-luxury-gold" />,
-      title: "Ratenkauf",
-      description: "Bequeme Ratenzahlung ohne Zinsen",
-      features: ["0% Zinsen bis 84 Monate", "Flexible Raten", "Keine Anzahlung"]
-    }
-  ];
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main className="pt-20">
@@ -55,198 +36,160 @@ const Financing = () => {
         <section className="bg-luxury-black text-white py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Finanzierung
+              Finanzierungsrechner
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Flexible Finanzierungslösungen für Ihren Traumwagen
+              Berechnen Sie Ihre monatlichen Zahlungen und finden Sie die besten Finanzierungsoptionen für Ihr Traumauto.
             </p>
           </div>
         </section>
 
         {/* Calculator Section */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              
-              {/* Financing Calculator */}
-              <Card>
+        <section className="py-12">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card className="shadow-lg border-0">
+              <CardHeader className="bg-gray-100 py-4">
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <Calculator className="h-5 w-5 text-luxury-gold" />
+                  Finanzierungsdetails
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Vehicle Price */}
+                  <div>
+                    <Label htmlFor="vehiclePrice" className="block text-sm font-medium text-gray-700">
+                      Fahrzeugpreis (€)
+                    </Label>
+                    <Input
+                      type="number"
+                      id="vehiclePrice"
+                      value={vehiclePrice}
+                      onChange={(e) => setVehiclePrice(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  {/* Down Payment */}
+                  <div>
+                    <Label htmlFor="downPayment" className="block text-sm font-medium text-gray-700">
+                      Anzahlung (€)
+                    </Label>
+                    <Input
+                      type="number"
+                      id="downPayment"
+                      value={downPayment}
+                      onChange={(e) => setDownPayment(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  {/* Interest Rate */}
+                  <div>
+                    <Label htmlFor="interestRate" className="block text-sm font-medium text-gray-700">
+                      Zinssatz (%)
+                    </Label>
+                    <Input
+                      type="number"
+                      id="interestRate"
+                      value={interestRate}
+                      onChange={(e) => setInterestRate(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  {/* Loan Term */}
+                  <div>
+                    <Label htmlFor="loanTerm" className="block text-sm font-medium text-gray-700">
+                      Laufzeit (Monate)
+                    </Label>
+                    <Input
+                      type="number"
+                      id="loanTerm"
+                      value={loanTerm}
+                      onChange={(e) => setLoanTerm(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+
+                {/* Monthly Payment Result */}
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold flex items-center gap-2 text-luxury-black">
+                    <CreditCard className="h-5 w-5 text-luxury-gold" />
+                    Monatliche Zahlung:
+                  </h3>
+                  <div className="mt-2 text-2xl font-bold text-luxury-gold">
+                    €{calculateMonthlyPayment()}
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Basierend auf Ihren Angaben.
+                  </p>
+                </div>
+
+                {/* Disclaimer */}
+                <div className="mt-6 p-4 bg-gray-100 rounded-md text-sm text-gray-500">
+                  <FileText className="h-4 w-4 inline-block mr-1" />
+                  Hinweis: Dieses ist nur eine Schätzung. Für genaue Finanzierungsangebote kontaktieren Sie uns bitte.
+                </div>
+
+                {/* CTA Button */}
+                <div className="mt-8">
+                  <Button className="bg-luxury-gold hover:bg-luxury-dark-gold text-black">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Fordern Sie jetzt ein Angebot an
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Advantages Section */}
+        <section className="py-12 bg-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-luxury-black mb-8">
+              Ihre Vorteile bei uns
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Advantage 1 */}
+              <Card className="shadow-md border-0">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-luxury-black flex items-center">
-                    <Calculator className="h-6 w-6 mr-2 text-luxury-gold" />
-                    Finanzierungsrechner
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Euro className="h-5 w-5 text-luxury-gold" />
+                    Wettbewerbsfähige Zinssätze
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-luxury-black mb-2">
-                      Kaufpreis (€)
-                    </label>
-                    <Input
-                      type="number"
-                      value={loanAmount}
-                      onChange={(e) => setLoanAmount(Number(e.target.value))}
-                      className="text-lg"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-luxury-black mb-2">
-                      Laufzeit (Monate)
-                    </label>
-                    <Select value={loanTerm.toString()} onValueChange={(value) => setLoanTerm(Number(value))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="12">12 Monate</SelectItem>
-                        <SelectItem value="24">24 Monate</SelectItem>
-                        <SelectItem value="36">36 Monate</SelectItem>
-                        <SelectItem value="48">48 Monate</SelectItem>
-                        <SelectItem value="60">60 Monate</SelectItem>
-                        <SelectItem value="72">72 Monate</SelectItem>
-                        <SelectItem value="84">84 Monate</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-luxury-black mb-2">
-                      Zinssatz (% p.a.)
-                    </label>
-                    <Input
-                      type="number"
-                      value={interestRate}
-                      disabled
-                      className="bg-gray-100"
-                    />
-                    <p className="text-xs text-luxury-gray mt-1">
-                      0% Zinsen für alle unsere Kunden
-                    </p>
-                  </div>
-                  
-                  <div className="bg-luxury-gold/10 p-6 rounded-lg text-center">
-                    <h3 className="text-lg font-medium text-luxury-black mb-2">
-                      Monatliche Rate
-                    </h3>
-                    <div className="text-3xl font-bold text-luxury-black">
-                      €{calculateMonthlyPayment()}
-                    </div>
-                    <p className="text-sm text-luxury-gray mt-1">
-                      bei {interestRate}% Zinsen über {loanTerm} Monate
-                    </p>
-                  </div>
-                  
-                  <Button 
-                    size="lg"
-                    className="w-full bg-luxury-gold hover:bg-luxury-dark-gold text-black"
-                  >
-                    Finanzierungsanfrage stellen
-                  </Button>
+                <CardContent className="text-sm text-gray-600">
+                  Profitieren Sie von unseren exklusiven Partnerschaften mit führenden Banken, um die besten Zinssätze zu erhalten.
                 </CardContent>
               </Card>
 
-              {/* Financing Options */}
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-luxury-black">
-                  Unsere Finanzierungsoptionen
-                </h2>
-                
-                {financingOptions.map((option, index) => (
-                  <Card key={index} className="border-0 shadow-lg">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="flex-shrink-0">
-                          {option.icon}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-luxury-black mb-2">
-                            {option.title}
-                          </h3>
-                          <p className="text-luxury-gray mb-4">
-                            {option.description}
-                          </p>
-                          <ul className="space-y-2">
-                            {option.features.map((feature, idx) => (
-                              <li key={idx} className="flex items-center text-sm text-luxury-gray">
-                                <CheckCircle className="h-4 w-4 text-luxury-gold mr-2" />
-                                {feature}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+              {/* Advantage 2 */}
+              <Card className="shadow-md border-0">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Percent className="h-5 w-5 text-luxury-gold" />
+                    Flexible Zahlungspläne
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-gray-600">
+                  Wir bieten massgeschneiderte Zahlungspläne, die auf Ihre individuellen Bedürfnisse und Ihr Budget zugeschnitten sind.
+                </CardContent>
+              </Card>
 
-        {/* Benefits Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-luxury-black text-center mb-12">
-              Warum unsere Finanzierung?
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                {
-                  title: "Schnelle Bearbeitung",
-                  description: "Entscheidung innerhalb von 24 Stunden"
-                },
-                {
-                  title: "Flexible Laufzeiten",
-                  description: "Von 12 bis 84 Monaten wählbar"
-                },
-                {
-                  title: "0% Zinsen",
-                  description: "Keine Zinsen für alle Kunden"
-                },
-                {
-                  title: "Persönliche Beratung",
-                  description: "Individuelle Lösung für Ihre Bedürfnisse"
-                }
-              ].map((benefit, index) => (
-                <Card key={index} className="text-center border-0 shadow-lg">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-luxury-black mb-2">
-                      {benefit.title}
-                    </h3>
-                    <p className="text-luxury-gray text-sm">
-                      {benefit.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-16 bg-luxury-black text-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold mb-4">
-              Bereit für Ihren Traumwagen?
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Lassen Sie sich unverbindlich beraten
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg"
-                className="bg-luxury-gold hover:bg-luxury-dark-gold text-black"
-              >
-                Finanzierung anfragen
-              </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-black"
-              >
-                Persönliche Beratung
-              </Button>
+              {/* Advantage 3 */}
+              <Card className="shadow-md border-0">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-luxury-gold" />
+                    Einfacher Antragsprozess
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-gray-600">
+                  Unser unkomplizierter Antragsprozess macht es Ihnen leicht, schnell und bequem eine Finanzierung zu erhalten.
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
@@ -259,3 +202,9 @@ const Financing = () => {
 };
 
 export default Financing;
+
+const Label = ({ htmlFor, className, children }: { htmlFor: string; className?: string; children: React.ReactNode }) => (
+  <label htmlFor={htmlFor} className={`block text-sm font-medium text-gray-700 ${className}`}>
+    {children}
+  </label>
+);

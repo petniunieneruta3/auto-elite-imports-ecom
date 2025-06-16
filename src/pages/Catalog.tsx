@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import VehicleGrid from '@/components/VehicleGrid';
+import LanguageSelector from '@/components/LanguageSelector';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, Heart, Eye, Star, Grid3X3, List } from 'lucide-react';
+import { Search, Filter, Grid3X3, List, Heart, Eye, Star } from 'lucide-react';
 
 const Catalog = () => {
   const [viewMode, setViewMode] = useState('grid');
@@ -132,10 +133,11 @@ const Catalog = () => {
         <section className="bg-luxury-black text-white py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Premium Fahrzeug-Katalog
+              Katalog Premium-Fahrzeuge
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Erkunden Sie unsere exklusive Kollektion, jedes Fahrzeug von unseren Experten inspiziert.
+              Entdecken Sie unsere exklusive Sammlung handverlesener Luxusfahrzeuge, 
+              jedes von unseren Experten inspiziert und zertifiziert.
             </p>
           </div>
         </section>
@@ -347,6 +349,7 @@ const Catalog = () => {
       </main>
 
       <Footer />
+      <LanguageSelector />
     </div>
   );
 };

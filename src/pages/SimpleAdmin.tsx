@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SimpleVehicleForm from '@/components/SimpleVehicleForm';
+import LanguageSelector from '@/components/LanguageSelector';
 
 interface Vehicle {
   id: string;
@@ -38,6 +39,7 @@ const SimpleAdmin = () => {
   const [error, setError] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [refreshLoading, setRefreshLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchVehicles();
@@ -192,7 +194,7 @@ const SimpleAdmin = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-luxury-black mb-2">
@@ -359,6 +361,7 @@ const SimpleAdmin = () => {
       )}
 
       <Footer />
+      <LanguageSelector />
     </div>
   );
 };

@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import LanguageSelector from '@/components/LanguageSelector';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -67,7 +68,7 @@ const Auth = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="pt-20 pb-16">
+      <main className="pt-20">
         <div className="max-w-md mx-auto px-4">
           <Card>
             <CardHeader className="text-center">
@@ -137,6 +138,7 @@ const Auth = () => {
       </main>
 
       <Footer />
+      <LanguageSelector />
     </div>
   );
 };

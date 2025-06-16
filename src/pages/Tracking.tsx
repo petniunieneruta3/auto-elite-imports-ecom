@@ -1,39 +1,33 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LanguageSelector from '@/components/LanguageSelector';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Package, Truck, CheckCircle, Clock } from 'lucide-react';
+import { Search, Package, Truck, CheckCircle, MapPin, Calendar } from 'lucide-react';
 
 const Tracking = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
-  const [trackingResult, setTrackingResult] = useState(null);
+  const [trackingStatus, setTrackingStatus] = useState('');
+  const [estimatedDelivery, setEstimatedDelivery] = useState('');
+  const [location, setLocation] = useState('');
+  const [trackingHistory, setTrackingHistory] = useState([
+    { date: '2024-01-20', status: 'Bestellung aufgegeben' },
+    { date: '2024-01-21', status: 'Im Lager bearbeitet' },
+    { date: '2024-01-22', status: 'Versendet' },
+  ]);
 
-  const handleTracking = () => {
-    // Simulation d'un résultat de tracking
-    if (trackingNumber) {
-      setTrackingResult({
-        orderNumber: trackingNumber,
-        status: 'En transit',
-        vehicle: 'BMW M5 Competition',
-        estimatedDelivery: '25.06.2024',
-        currentLocation: 'Hamburg, Deutschland',
-        timeline: [
-          { date: '20.06.2024', status: 'Bestellung bestätigt', completed: true },
-          { date: '21.06.2024', status: 'Fahrzeug vorbereitet', completed: true },
-          { date: '22.06.2024', status: 'Transport gestartet', completed: true },
-          { date: '25.06.2024', status: 'Lieferung', completed: false }
-        ]
-      });
-    }
+  const handleTrack = () => {
+    // Mock tracking data
+    setTrackingStatus('Unterwegs');
+    setEstimatedDelivery('2024-01-25');
+    setLocation('Berlin');
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main className="pt-20">
@@ -44,154 +38,96 @@ const Tracking = () => {
               Sendungsverfolgung
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Verfolgen Sie den Status Ihrer Fahrzeuglieferung in Echtzeit
+              Verfolgen Sie den Fortschritt Ihrer Bestellung mit unserer einfachen Sendungsverfolgung.
             </p>
           </div>
         </section>
 
         {/* Tracking Form */}
-        <section className="py-16">
+        <section className="py-8 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl text-luxury-black text-center">
-                  Geben Sie Ihre Auftragsnummer ein
-                </CardTitle>
+                <CardTitle>Sendung verfolgen</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="z.B. AUE-2024-001234"
-                      value={trackingNumber}
-                      onChange={(e) => setTrackingNumber(e.target.value)}
-                      className="text-lg py-3"
-                    />
-                  </div>
-                  <Button 
-                    onClick={handleTracking}
-                    size="lg"
-                    className="bg-luxury-gold hover:bg-luxury-dark-gold text-black px-8"
-                  >
-                    <Search className="h-5 w-5 mr-2" />
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Input
+                    type="text"
+                    placeholder="Trackingnummer eingeben"
+                    value={trackingNumber}
+                    onChange={(e) => setTrackingNumber(e.target.value)}
+                  />
+                  <Button onClick={handleTrack}>
+                    <Search className="h-4 w-4 mr-2" />
                     Verfolgen
                   </Button>
                 </div>
-                <p className="text-sm text-luxury-gray mt-2">
-                  Die Auftragsnummer finden Sie in Ihrer Bestellbestätigung
-                </p>
               </CardContent>
             </Card>
+          </div>
+        </section>
 
-            {/* Tracking Results */}
-            {trackingResult && (
-              <div className="mt-8 space-y-6">
-                {/* Status Overview */}
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="text-center">
-                        <div className="flex justify-center mb-2">
-                          <Truck className="h-8 w-8 text-luxury-gold" />
-                        </div>
-                        <h3 className="font-medium text-luxury-black">Status</h3>
-                        <Badge className="bg-luxury-gold text-black mt-1">
-                          {trackingResult.status}
-                        </Badge>
-                      </div>
-                      <div className="text-center">
-                        <div className="flex justify-center mb-2">
-                          <Package className="h-8 w-8 text-luxury-gold" />
-                        </div>
-                        <h3 className="font-medium text-luxury-black">Fahrzeug</h3>
-                        <p className="text-luxury-gray">{trackingResult.vehicle}</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="flex justify-center mb-2">
-                          <Clock className="h-8 w-8 text-luxury-gold" />
-                        </div>
-                        <h3 className="font-medium text-luxury-black">Voraussichtliche Lieferung</h3>
-                        <p className="text-luxury-gray">{trackingResult.estimatedDelivery}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Timeline */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-xl text-luxury-black">
-                      Sendungsverlauf
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {trackingResult.timeline.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-4">
-                          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                            item.completed ? 'bg-luxury-gold' : 'bg-gray-300'
-                          }`}>
-                            {item.completed ? (
-                              <CheckCircle className="h-5 w-5 text-black" />
-                            ) : (
-                              <Clock className="h-5 w-5 text-gray-600" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center">
-                              <span className={`font-medium ${
-                                item.completed ? 'text-luxury-black' : 'text-gray-500'
-                              }`}>
-                                {item.status}
-                              </span>
-                              <span className="text-sm text-luxury-gray">
-                                {item.date}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Current Location */}
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <h3 className="text-lg font-medium text-luxury-black mb-2">
-                        Aktuelle Position
-                      </h3>
-                      <p className="text-luxury-gray">
-                        {trackingResult.currentLocation}
+        {/* Tracking Status */}
+        {trackingStatus && (
+          <section className="py-8 bg-gray-50">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sendungsstatus</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <Package className="h-12 w-12 text-luxury-gold" />
+                    <div>
+                      <p className="text-lg font-semibold">
+                        Status: <Badge className="ml-2">{trackingStatus}</Badge>
+                      </p>
+                      <p className="text-gray-500">
+                        Geschätzte Lieferung:{' '}
+                        <Calendar className="h-4 w-4 inline-block mr-1" />
+                        {estimatedDelivery}
+                      </p>
+                      <p className="text-gray-500">
+                        Standort: <MapPin className="h-4 w-4 inline-block mr-1" />
+                        {location}
                       </p>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Help Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-luxury-black mb-4">
-              Probleme beim Tracking?
-            </h2>
-            <p className="text-luxury-gray mb-6">
-              Kontaktieren Sie unser Support-Team für Hilfe
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-luxury-gold hover:bg-luxury-dark-gold text-black">
-                Support kontaktieren
-              </Button>
-              <Button variant="outline" className="border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-black">
-                FAQ ansehen
-              </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {/* Tracking History */}
+        {trackingHistory.length > 0 && (
+          <section className="py-8 bg-white">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sendungsverlauf</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul>
+                    {trackingHistory.map((item, index) => (
+                      <li key={index} className="flex items-center space-x-4">
+                        <CheckCircle className="h-6 w-6 text-green-500" />
+                        <div>
+                          <p className="font-semibold">{item.status}</p>
+                          <p className="text-gray-500">
+                            <Calendar className="h-4 w-4 inline-block mr-1" />
+                            {item.date}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />

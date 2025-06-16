@@ -1,17 +1,44 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LanguageSelector from '@/components/LanguageSelector';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Phone, Mail, Clock, Instagram, MessageSquare } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapPin, Phone, Mail, Clock, MessageSquare, Instagram } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+
+  const { toast } = useToast();
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    toast({
+      title: 'Nachricht gesendet!',
+      description: 'Ihre Nachricht wurde erfolgreich gesendet.',
+      status: 'success'
+    });
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main className="pt-20">
@@ -118,19 +145,19 @@ const Contact = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form className="space-y-6">
+                  <form className="space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="firstName" className="block text-sm font-medium text-luxury-black mb-2">
                           Vorname *
                         </label>
-                        <Input id="firstName" placeholder="Ihr Vorname" />
+                        <Input id="firstName" placeholder="Ihr Vorname" value={formData.firstName} onChange={handleInputChange} />
                       </div>
                       <div>
                         <label htmlFor="lastName" className="block text-sm font-medium text-luxury-black mb-2">
                           Nachname *
                         </label>
-                        <Input id="lastName" placeholder="Ihr Nachname" />
+                        <Input id="lastName" placeholder="Ihr Nachname" value={formData.lastName} onChange={handleInputChange} />
                       </div>
                     </div>
                     
@@ -138,21 +165,21 @@ const Contact = () => {
                       <label htmlFor="email" className="block text-sm font-medium text-luxury-black mb-2">
                         E-Mail *
                       </label>
-                      <Input id="email" type="email" placeholder="ihre.email@beispiel.de" />
+                      <Input id="email" type="email" placeholder="ihre.email@beispiel.de" value={formData.email} onChange={handleInputChange} />
                     </div>
                     
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium text-luxury-black mb-2">
                         Telefon
                       </label>
-                      <Input id="phone" type="tel" placeholder="Ihre Telefonnummer" />
+                      <Input id="phone" type="tel" placeholder="Ihre Telefonnummer" value={formData.phone} onChange={handleInputChange} />
                     </div>
                     
                     <div>
                       <label htmlFor="subject" className="block text-sm font-medium text-luxury-black mb-2">
                         Betreff
                       </label>
-                      <Input id="subject" placeholder="Worum geht es?" />
+                      <Input id="subject" placeholder="Worum geht es?" value={formData.subject} onChange={handleInputChange} />
                     </div>
                     
                     <div>
@@ -162,6 +189,8 @@ const Contact = () => {
                       <Textarea 
                         id="message" 
                         placeholder="Ihre Nachricht..."
+                        value={formData.message} 
+                        onChange={handleInputChange}
                         rows={6}
                       />
                     </div>

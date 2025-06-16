@@ -1,17 +1,33 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Card, CardContent } from '@/components/ui/card';
+import LanguageSelector from '@/components/LanguageSelector';
+import VehicleImageGallery from '@/components/VehicleImageGallery';
+import PaymentForm from '@/components/PaymentForm';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Heart, Share2, Star, ShoppingCart, Phone, Mail, MapPin } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  ArrowLeft, 
+  Heart, 
+  Share2, 
+  MapPin, 
+  Calendar, 
+  Gauge, 
+  Fuel, 
+  Cog, 
+  Palette,
+  Star,
+  Phone,
+  Mail,
+  MessageCircle,
+  ShoppingCart
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import { useVehicleImages } from '@/hooks/useVehicleImages';
-import VehicleImageGallery from '@/components/VehicleImageGallery';
 
 interface Vehicle {
   id: string;
@@ -384,6 +400,7 @@ const VehicleDetail = () => {
       </main>
 
       <Footer />
+      <LanguageSelector />
     </div>
   );
 };
