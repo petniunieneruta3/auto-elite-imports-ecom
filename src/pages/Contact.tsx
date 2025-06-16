@@ -20,6 +20,7 @@ const Contact = () => {
     message: ''
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (e) => {
@@ -29,12 +30,54 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast({
-      title: 'Nachricht gesendet!',
-      description: 'Ihre Nachricht wurde erfolgreich gesendet.',
-    });
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('https://formspree.io/f/xzzggyqk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Nachricht gesendet!',
+          description: 'Ihre Nachricht wurde erfolgreich gesendet. Wir werden uns bald bei Ihnen melden.',
+        });
+        
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        throw new Error('Fehler beim Senden der Nachricht');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: 'Fehler',
+        description: 'Beim Senden der Nachricht ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -151,13 +194,25 @@ const Contact = () => {
                         <label htmlFor="firstName" className="block text-sm font-medium text-luxury-black mb-2">
                           Vorname *
                         </label>
-                        <Input id="firstName" placeholder="Ihr Vorname" value={formData.firstName} onChange={handleInputChange} />
+                        <Input 
+                          id="firstName" 
+                          placeholder="Ihr Vorname" 
+                          value={formData.firstName} 
+                          onChange={handleInputChange}
+                          required 
+                        />
                       </div>
                       <div>
                         <label htmlFor="lastName" className="block text-sm font-medium text-luxury-black mb-2">
                           Nachname *
                         </label>
-                        <Input id="lastName" placeholder="Ihr Nachname" value={formData.lastName} onChange={handleInputChange} />
+                        <Input 
+                          id="lastName" 
+                          placeholder="Ihr Nachname" 
+                          value={formData.lastName} 
+                          onChange={handleInputChange}
+                          required 
+                        />
                       </div>
                     </div>
                     
@@ -165,21 +220,39 @@ const Contact = () => {
                       <label htmlFor="email" className="block text-sm font-medium text-luxury-black mb-2">
                         E-Mail *
                       </label>
-                      <Input id="email" type="email" placeholder="ihre.email@beispiel.de" value={formData.email} onChange={handleInputChange} />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="ihre.email@beispiel.de" 
+                        value={formData.email} 
+                        onChange={handleInputChange}
+                        required 
+                      />
                     </div>
                     
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium text-luxury-black mb-2">
                         Telefon
                       </label>
-                      <Input id="phone" type="tel" placeholder="Ihre Telefonnummer" value={formData.phone} onChange={handleInputChange} />
+                      <Input 
+                        id="phone" 
+                        type="tel" 
+                        placeholder="Ihre Telefonnummer" 
+                        value={formData.phone} 
+                        onChange={handleInputChange} 
+                      />
                     </div>
                     
                     <div>
                       <label htmlFor="subject" className="block text-sm font-medium text-luxury-black mb-2">
                         Betreff
                       </label>
-                      <Input id="subject" placeholder="Worum geht es?" value={formData.subject} onChange={handleInputChange} />
+                      <Input 
+                        id="subject" 
+                        placeholder="Worum geht es?" 
+                        value={formData.subject} 
+                        onChange={handleInputChange} 
+                      />
                     </div>
                     
                     <div>
@@ -192,6 +265,7 @@ const Contact = () => {
                         value={formData.message} 
                         onChange={handleInputChange}
                         rows={6}
+                        required
                       />
                     </div>
                     
@@ -199,8 +273,9 @@ const Contact = () => {
                       type="submit"
                       size="lg"
                       className="w-full bg-luxury-gold hover:bg-luxury-dark-gold text-black"
+                      disabled={isSubmitting}
                     >
-                      Nachricht senden
+                      {isSubmitting ? 'Senden...' : 'Nachricht senden'}
                     </Button>
                   </form>
                 </CardContent>
