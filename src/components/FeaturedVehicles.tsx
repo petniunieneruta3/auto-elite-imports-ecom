@@ -164,22 +164,36 @@ const FeaturedVehicles: React.FC<FeaturedVehiclesProps> = ({ searchFilters }) =>
       console.log('FeaturedVehicles: Fetching featured vehicles with filters:', searchFilters);
       setLoading(true);
       
+      // First, let's get a sample of the actual data to understand the format
+      const { data: sampleData } = await supabase
+        .from('vehicles')
+        .select('*')
+        .limit(5);
+        
+      console.log('FeaturedVehicles: Sample vehicle data from database:', sampleData);
+      
       let query = supabase
         .from('vehicles')
         .select('*');
 
       // Apply search filters if provided
       if (searchFilters) {
+        console.log('FeaturedVehicles: Applying filters:', searchFilters);
+        
         if (searchFilters.brand) {
+          console.log(`FeaturedVehicles: Filtering by brand: ${searchFilters.brand}`);
           query = query.ilike('brand', `%${searchFilters.brand}%`);
         }
         if (searchFilters.model) {
+          console.log(`FeaturedVehicles: Filtering by model: ${searchFilters.model}`);
           query = query.ilike('model', `%${searchFilters.model}%`);
         }
         if (searchFilters.fuel) {
+          console.log(`FeaturedVehicles: Filtering by fuel: ${searchFilters.fuel}`);
           query = query.ilike('fuel', `%${searchFilters.fuel}%`);
         }
         if (searchFilters.transmission) {
+          console.log(`FeaturedVehicles: Filtering by transmission: ${searchFilters.transmission}`);
           query = query.ilike('transmission', `%${searchFilters.transmission}%`);
         }
         if (searchFilters.minPrice) {
@@ -210,6 +224,7 @@ const FeaturedVehicles: React.FC<FeaturedVehiclesProps> = ({ searchFilters }) =>
         console.error('FeaturedVehicles: Error fetching vehicles:', error);
       } else {
         console.log('FeaturedVehicles: Vehicles fetched successfully:', data);
+        console.log('FeaturedVehicles: Number of vehicles found:', data?.length);
         setVehicles(data || []);
       }
     } catch (error) {
