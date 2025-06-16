@@ -140,7 +140,7 @@ const Admin = () => {
   const handleCloseVehicleForm = () => {
     setIsVehicleFormOpen(false);
     setEditingVehicle(null);
-    fetchVehicles();
+    fetchVehicles(); // Refresh the vehicles list when form closes
   };
 
   return (
@@ -259,7 +259,6 @@ const Admin = () => {
                 <VehicleForm
                   vehicle={editingVehicle}
                   onClose={handleCloseVehicleForm}
-                  onVehicleUpdated={fetchVehicles}
                 />
               </CardContent>
             </Card>
