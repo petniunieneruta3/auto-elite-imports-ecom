@@ -92,12 +92,11 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch }) => {
                 <Label htmlFor="brand" className="text-sm font-medium text-gray-700 mb-2 block">
                   Marke
                 </Label>
-                <Select value={filters.brand} onValueChange={(value) => handleInputChange('brand', value)}>
+                <Select value={filters.brand} onValueChange={(value) => handleInputChange('brand', value || '')}>
                   <SelectTrigger>
                     <SelectValue placeholder="Alle Marken" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Alle Marken</SelectItem>
                     <SelectItem value="Mercedes-Benz">Mercedes-Benz</SelectItem>
                     <SelectItem value="BMW">BMW</SelectItem>
                     <SelectItem value="Audi">Audi</SelectItem>
@@ -131,12 +130,11 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch }) => {
                 <Label htmlFor="fuel" className="text-sm font-medium text-gray-700 mb-2 block">
                   Kraftstoff
                 </Label>
-                <Select value={filters.fuel} onValueChange={(value) => handleInputChange('fuel', value)}>
+                <Select value={filters.fuel} onValueChange={(value) => handleInputChange('fuel', value || '')}>
                   <SelectTrigger>
                     <SelectValue placeholder="Alle Kraftstoffe" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Alle Kraftstoffe</SelectItem>
                     <SelectItem value="Benzin">Benzin</SelectItem>
                     <SelectItem value="Diesel">Diesel</SelectItem>
                     <SelectItem value="Hybrid">Hybrid</SelectItem>
@@ -151,12 +149,11 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch }) => {
                 <Label htmlFor="transmission" className="text-sm font-medium text-gray-700 mb-2 block">
                   Getriebe
                 </Label>
-                <Select value={filters.transmission} onValueChange={(value) => handleInputChange('transmission', value)}>
+                <Select value={filters.transmission} onValueChange={(value) => handleInputChange('transmission', value || '')}>
                   <SelectTrigger>
                     <SelectValue placeholder="Alle Getriebe" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Alle Getriebe</SelectItem>
                     <SelectItem value="Automatik">Automatik</SelectItem>
                     <SelectItem value="Manuell">Manuell</SelectItem>
                   </SelectContent>
@@ -190,23 +187,21 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch }) => {
                   Baujahr
                 </Label>
                 <div className="flex space-x-2">
-                  <Select value={filters.minYear} onValueChange={(value) => handleInputChange('minYear', value)}>
+                  <Select value={filters.minYear} onValueChange={(value) => handleInputChange('minYear', value || '')}>
                     <SelectTrigger>
                       <SelectValue placeholder="Von" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Von</SelectItem>
                       {years.map(year => (
                         <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select value={filters.maxYear} onValueChange={(value) => handleInputChange('maxYear', value)}>
+                  <Select value={filters.maxYear} onValueChange={(value) => handleInputChange('maxYear', value || '')}>
                     <SelectTrigger>
                       <SelectValue placeholder="Bis" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Bis</SelectItem>
                       {years.map(year => (
                         <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                       ))}
