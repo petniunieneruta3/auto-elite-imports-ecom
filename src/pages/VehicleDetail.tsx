@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import LanguageSelector from '@/components/LanguageSelector';
 import VehicleImageGallery from '@/components/VehicleImageGallery';
 import PaymentForm from '@/components/PaymentForm';
+import { useVehicleImages } from '@/hooks/useVehicleImages';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

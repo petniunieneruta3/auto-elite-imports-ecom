@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -33,7 +34,6 @@ const Contact = () => {
     toast({
       title: 'Nachricht gesendet!',
       description: 'Ihre Nachricht wurde erfolgreich gesendet.',
-      status: 'success'
     });
   };
 

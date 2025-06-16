@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -40,9 +41,9 @@ interface Vehicle {
 const Admin = () => {
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [users, setUsers] = useState([]);
+  const [profiles, setProfiles] = useState([]);
   const [activeTab, setActiveTab] = useState("vehicles");
-  const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [isVehicleFormOpen, setIsVehicleFormOpen] = useState(false);
   const { user, signOut, isAdmin } = useAuth();
   const { toast } = useToast();
@@ -52,7 +53,7 @@ const Admin = () => {
       navigate('/auth');
     } else {
       fetchVehicles();
-      fetchUsers();
+      fetchProfiles();
     }
   }, [user, isAdmin, navigate]);
 
@@ -73,19 +74,19 @@ const Admin = () => {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchProfiles = async () => {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*');
 
       if (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching profiles:", error);
       } else {
-        setUsers(data || []);
+        setProfiles(data || []);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching profiles:", error);
     }
   };
 
@@ -120,19 +121,19 @@ const Admin = () => {
     }
   };
 
-  const handleEditVehicle = (vehicleId: string) => {
-    setEditingVehicleId(vehicleId);
+  const handleEditVehicle = (vehicle: Vehicle) => {
+    setEditingVehicle(vehicle);
     setIsVehicleFormOpen(true);
   };
 
   const handleOpenVehicleForm = () => {
-    setEditingVehicleId(null);
+    setEditingVehicle(null);
     setIsVehicleFormOpen(true);
   };
 
   const handleCloseVehicleForm = () => {
     setIsVehicleFormOpen(false);
-    setEditingVehicleId(null);
+    setEditingVehicle(null);
     fetchVehicles();
   };
 
@@ -196,7 +197,7 @@ const Admin = () => {
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => handleEditVehicle(vehicle.id)}
+                                onClick={() => handleEditVehicle(vehicle)}
                               >
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
@@ -218,9 +219,9 @@ const Admin = () => {
                   <TabsContent value="users" className="space-y-4">
                     <CardTitle>User Management</CardTitle>
                     <ul>
-                      {users.map((user: any) => (
-                        <li key={user.id} className="py-2 border-b border-gray-200">
-                          {user.email}
+                      {profiles.map((profile: any) => (
+                        <li key={profile.id} className="py-2 border-b border-gray-200">
+                          {profile.email}
                         </li>
                       ))}
                     </ul>
@@ -245,12 +246,12 @@ const Admin = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-2xl font-bold">
-                  {editingVehicleId ? "Edit Vehicle" : "Add Vehicle"}
+                  {editingVehicle ? "Edit Vehicle" : "Add Vehicle"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <VehicleForm
-                  vehicleId={editingVehicleId}
+                  vehicle={editingVehicle}
                   onClose={handleCloseVehicleForm}
                   onVehicleUpdated={fetchVehicles}
                 />
