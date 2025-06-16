@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, User, Mail, Phone, MapPin, Calendar, Lock } from 'lucide-react';
+import { CreditCard, User, Mail, Phone, MapPin, Building2, Copy } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PaymentFormProps {
   totalAmount: number;
@@ -20,6 +21,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   onSubmit,
   onCancel
 }) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     // Personal Information
     firstName: '',
@@ -32,14 +34,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     city: '',
     zipCode: '',
     country: 'Deutschland',
-    
-    // Payment Information
-    cardNumber: '',
-    expiryMonth: '',
-    expiryYear: '',
-    cvv: '',
-    cardName: ''
   });
+
+  // Bank details for wire transfer
+  const bankDetails = {
+    bankName: "Deutsche Bank AG",
+    iban: "DE89 3704 0044 0532 0130 00",
+    bic: "COBADEFFXXX",
+    accountHolder: "Luxury Cars GmbH",
+    reference: `ORDER-${Date.now()}`
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -50,7 +54,24 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    // Add bank transfer reference to form data
+    const orderData = {
+      ...formData,
+      paymentMethod: 'bank_transfer',
+      transferReference: bankDetails.reference,
+      amount: depositAmount
+    };
+    
+    onSubmit(orderData);
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Kopiert!",
+      description: `${label} wurde in die Zwischenablage kopiert.`,
+    });
   };
 
   return (
@@ -69,7 +90,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <span className="font-semibold">€{totalAmount.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-luxury-gold">
-            <span>Anzahlung (20%):</span>
+            <span>Anzahlung per Überweisung (20%):</span>
             <span className="font-bold">€{depositAmount.toLocaleString()}</span>
           </div>
           <Separator />
@@ -196,76 +217,100 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </CardContent>
         </Card>
 
-        {/* Payment Information */}
+        {/* Bank Transfer Information */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Lock className="h-5 w-5" />
-              <span>Zahlungsinformationen</span>
+              <Building2 className="h-5 w-5" />
+              <span>Bankverbindung für Überweisung</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="cardName">Name auf der Karte *</Label>
-              <Input
-                id="cardName"
-                type="text"
-                required
-                value={formData.cardName}
-                onChange={(e) => handleInputChange('cardName', e.target.value)}
-              />
+            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Bank:</span>
+                <div className="flex items-center space-x-2">
+                  <span>{bankDetails.bankName}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => copyToClipboard(bankDetails.bankName, 'Bankname')}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">IBAN:</span>
+                <div className="flex items-center space-x-2">
+                  <span className="font-mono">{bankDetails.iban}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => copyToClipboard(bankDetails.iban, 'IBAN')}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">BIC:</span>
+                <div className="flex items-center space-x-2">
+                  <span className="font-mono">{bankDetails.bic}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => copyToClipboard(bankDetails.bic, 'BIC')}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Empfänger:</span>
+                <div className="flex items-center space-x-2">
+                  <span>{bankDetails.accountHolder}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => copyToClipboard(bankDetails.accountHolder, 'Empfänger')}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Verwendungszweck:</span>
+                <div className="flex items-center space-x-2">
+                  <span className="font-mono text-luxury-gold">{bankDetails.reference}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => copyToClipboard(bankDetails.reference, 'Verwendungszweck')}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center font-bold text-luxury-gold">
+                <span>Betrag:</span>
+                <span>€{depositAmount.toLocaleString()}</span>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="cardNumber">Kartennummer *</Label>
-              <Input
-                id="cardNumber"
-                type="text"
-                required
-                placeholder="1234 5678 9012 3456"
-                value={formData.cardNumber}
-                onChange={(e) => handleInputChange('cardNumber', e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="expiryMonth" className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>Monat *</span>
-                </Label>
-                <Input
-                  id="expiryMonth"
-                  type="text"
-                  required
-                  placeholder="MM"
-                  maxLength={2}
-                  value={formData.expiryMonth}
-                  onChange={(e) => handleInputChange('expiryMonth', e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="expiryYear">Jahr *</Label>
-                <Input
-                  id="expiryYear"
-                  type="text"
-                  required
-                  placeholder="JJ"
-                  maxLength={2}
-                  value={formData.expiryYear}
-                  onChange={(e) => handleInputChange('expiryYear', e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="cvv">CVV *</Label>
-                <Input
-                  id="cvv"
-                  type="text"
-                  required
-                  placeholder="123"
-                  maxLength={4}
-                  value={formData.cvv}
-                  onChange={(e) => handleInputChange('cvv', e.target.value)}
-                />
-              </div>
+            <div className="text-sm text-gray-600 space-y-2">
+              <p>• Bitte überweisen Sie den Anzahlungsbetrag innerhalb von 7 Tagen.</p>
+              <p>• Verwenden Sie unbedingt den angegebenen Verwendungszweck für eine schnelle Zuordnung.</p>
+              <p>• Nach Zahlungseingang erhalten Sie eine Bestätigung und weitere Informationen zur Lieferung.</p>
             </div>
           </CardContent>
         </Card>
@@ -284,13 +329,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             type="submit"
             className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black"
           >
-            Anzahlung bezahlen (€{depositAmount.toLocaleString()})
+            Bestellung bestätigen (€{depositAmount.toLocaleString()} überweisen)
           </Button>
         </div>
       </form>
 
       <div className="text-xs text-gray-500 text-center space-y-1">
-        <p>🔒 Ihre Zahlungsdaten werden sicher verschlüsselt übertragen</p>
+        <p>🏦 Überweisen Sie die Anzahlung sicher über Ihr Online-Banking</p>
         <p>Sie erhalten eine Bestätigungs-E-Mail nach dem Abschluss Ihrer Bestellung</p>
       </div>
     </div>
