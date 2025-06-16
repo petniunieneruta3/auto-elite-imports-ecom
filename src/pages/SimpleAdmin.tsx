@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,7 +47,7 @@ const SimpleAdmin = () => {
   }, []);
 
   const fetchVehicles = async () => {
-    console.log('Fetching vehicles...');
+    console.log('Fahrzeuge laden...');
     try {
       setError(null);
       setLoading(true);
@@ -56,22 +57,22 @@ const SimpleAdmin = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      console.log('Supabase response:', { data, error: fetchError });
+      console.log('Supabase Antwort:', { data, error: fetchError });
 
       if (fetchError) {
-        console.error('Supabase error:', fetchError);
+        console.error('Supabase Fehler:', fetchError);
         throw new Error(fetchError.message);
       }
       
-      console.log('Vehicles fetched:', data?.length || 0);
+      console.log('Fahrzeuge geladen:', data?.length || 0);
       setVehicles(data || []);
     } catch (error) {
-      console.error('Error fetching vehicles:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-      setError(`Erreur lors du chargement: ${errorMessage}`);
+      console.error('Fehler beim Laden der Fahrzeuge:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      setError(`Fehler beim Laden: ${errorMessage}`);
       toast({
-        title: "Erreur de connexion",
-        description: "Impossible de charger les véhicules. Vérifiez votre connexion.",
+        title: "Verbindungsfehler",
+        description: "Fahrzeuge konnten nicht geladen werden. Überprüfen Sie Ihre Verbindung.",
         variant: "destructive",
       });
     } finally {
@@ -80,69 +81,69 @@ const SimpleAdmin = () => {
   };
 
   const handleRefresh = async () => {
-    console.log('Manual refresh triggered');
+    console.log('Manuelle Aktualisierung ausgelöst');
     setRefreshLoading(true);
     await fetchVehicles();
     setRefreshLoading(false);
     toast({
-      title: "Liste actualisée",
-      description: "La liste des véhicules a été mise à jour",
+      title: "Liste aktualisiert",
+      description: "Die Fahrzeugliste wurde aktualisiert",
     });
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
+    if (!confirm('Sind Sie sicher, dass Sie dieses Fahrzeug löschen möchten?')) {
       return;
     }
 
-    console.log('Starting deletion for vehicle ID:', id);
+    console.log('Löschvorgang für Fahrzeug-ID gestartet:', id);
     
     try {
       setDeleteLoading(id);
       
-      // First, let's check if the vehicle exists
+      // Zuerst prüfen, ob das Fahrzeug existiert
       const { data: existingVehicle, error: checkError } = await supabase
         .from('vehicles')
         .select('id, brand, model')
         .eq('id', id)
         .single();
 
-      console.log('Vehicle check result:', { existingVehicle, checkError });
+      console.log('Fahrzeugprüfungsergebnis:', { existingVehicle, checkError });
 
       if (checkError) {
-        console.error('Error checking vehicle:', checkError);
-        throw new Error(`Véhicule non trouvé: ${checkError.message}`);
+        console.error('Fehler bei der Fahrzeugprüfung:', checkError);
+        throw new Error(`Fahrzeug nicht gefunden: ${checkError.message}`);
       }
 
-      // Now delete the vehicle
+      // Jetzt das Fahrzeug löschen
       const { error: deleteError, data: deleteData } = await supabase
         .from('vehicles')
         .delete()
         .eq('id', id)
         .select();
 
-      console.log('Delete operation result:', { deleteError, deleteData });
+      console.log('Löschvorgang Ergebnis:', { deleteError, deleteData });
 
       if (deleteError) {
-        console.error('Delete error:', deleteError);
-        throw new Error(`Erreur de suppression: ${deleteError.message}`);
+        console.error('Löschfehler:', deleteError);
+        throw new Error(`Löschfehler: ${deleteError.message}`);
       }
 
-      // Optimistically remove from local state immediately
+      // Optimistisch aus dem lokalen Zustand entfernen
       setVehicles(prevVehicles => prevVehicles.filter(vehicle => vehicle.id !== id));
 
-      console.log('Vehicle deleted successfully, updating UI');
+      console.log('Fahrzeug erfolgreich gelöscht, UI wird aktualisiert');
 
       toast({
-        title: "Véhicule supprimé",
-        description: `${existingVehicle.brand} ${existingVehicle.model} a été supprimé avec succès`,
+        title: "Fahrzeug gelöscht",
+        description: `${existingVehicle.brand} ${existingVehicle.model} wurde erfolgreich gelöscht`,
       });
 
     } catch (error) {
-      console.error('Error during deletion:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      console.error('Fehler beim Löschen:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
       toast({
-        title: "Erreur de suppression",
+        title: "Löschfehler",
         description: errorMessage,
         variant: "destructive",
       });
@@ -152,30 +153,30 @@ const SimpleAdmin = () => {
   };
 
   const handleEdit = (vehicle: Vehicle) => {
-    console.log('Edit button clicked for vehicle:', vehicle.id, vehicle.brand, vehicle.model);
+    console.log('Bearbeiten-Button geklickt für Fahrzeug:', vehicle.id, vehicle.brand, vehicle.model);
     setEditingVehicle(vehicle);
     setShowForm(true);
     toast({
-      title: "Mode modification",
-      description: `Modification de ${vehicle.brand} ${vehicle.model}`,
+      title: "Bearbeitungsmodus",
+      description: `Bearbeitung von ${vehicle.brand} ${vehicle.model}`,
     });
   };
 
   const handleAddNew = () => {
-    console.log('Add new vehicle button clicked');
+    console.log('Neues Fahrzeug hinzufügen Button geklickt');
     setEditingVehicle(null);
     setShowForm(true);
     toast({
-      title: "Nouveau véhicule",
-      description: "Formulaire d'ajout d'un nouveau véhicule ouvert",
+      title: "Neues Fahrzeug",
+      description: "Formular zum Hinzufügen eines neuen Fahrzeugs geöffnet",
     });
   };
 
   const handleFormClose = () => {
-    console.log('Form closed, refreshing vehicles...');
+    console.log('Formular geschlossen, Fahrzeuge werden aktualisiert...');
     setShowForm(false);
     setEditingVehicle(null);
-    // Always refresh after form closes to ensure data consistency
+    // Immer nach dem Schließen des Formulars aktualisieren, um Datenkonsistenz zu gewährleisten
     fetchVehicles();
   };
 
@@ -184,7 +185,7 @@ const SimpleAdmin = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-luxury-gold mx-auto"></div>
-          <p className="mt-4 text-luxury-gray">Chargement...</p>
+          <p className="mt-4 text-luxury-gray">Lädt...</p>
         </div>
       </div>
     );
@@ -198,10 +199,10 @@ const SimpleAdmin = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-luxury-black mb-2">
-              Administration des Véhicules
+              Fahrzeugverwaltung
             </h1>
             <p className="text-luxury-gray">
-              Gérez les véhicules de votre catalogue
+              Verwalten Sie die Fahrzeuge in Ihrem Katalog
             </p>
             {error && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
@@ -217,7 +218,7 @@ const SimpleAdmin = () => {
                   {refreshLoading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
                   ) : (
-                    'Réessayer'
+                    'Erneut versuchen'
                   )}
                 </Button>
               </div>
@@ -228,9 +229,9 @@ const SimpleAdmin = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Liste des Véhicules</CardTitle>
+                  <CardTitle>Fahrzeugliste</CardTitle>
                   <CardDescription>
-                    {vehicles.length} véhicule(s) dans le catalogue
+                    {vehicles.length} Fahrzeug(e) im Katalog
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -240,14 +241,14 @@ const SimpleAdmin = () => {
                     disabled={refreshLoading}
                   >
                     <RefreshCw className={`h-4 w-4 mr-2 ${refreshLoading ? 'animate-spin' : ''}`} />
-                    Actualiser
+                    Aktualisieren
                   </Button>
                   <Button
                     onClick={handleAddNew}
                     className="bg-luxury-gold hover:bg-luxury-dark-gold text-black"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Ajouter un véhicule
+                    Fahrzeug hinzufügen
                   </Button>
                 </div>
               </div>
@@ -255,13 +256,13 @@ const SimpleAdmin = () => {
             <CardContent>
               {vehicles.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">Aucun véhicule trouvé</p>
+                  <p className="text-gray-500 mb-4">Keine Fahrzeuge gefunden</p>
                   <Button
                     onClick={handleAddNew}
                     className="bg-luxury-gold hover:bg-luxury-dark-gold text-black"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Ajouter le premier véhicule
+                    Erstes Fahrzeug hinzufügen
                   </Button>
                 </div>
               ) : (
@@ -269,13 +270,13 @@ const SimpleAdmin = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Véhicule</TableHead>
-                        <TableHead>Année</TableHead>
-                        <TableHead>Prix</TableHead>
-                        <TableHead>Kilométrage</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead>Bild</TableHead>
+                        <TableHead>Fahrzeug</TableHead>
+                        <TableHead>Jahr</TableHead>
+                        <TableHead>Preis</TableHead>
+                        <TableHead>Kilometerstand</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Aktionen</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

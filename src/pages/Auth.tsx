@@ -38,16 +38,16 @@ const Auth = () => {
 
       if (error) {
         toast({
-          title: "Erreur d'authentification",
+          title: "Authentifizierungsfehler",
           description: error.message,
           variant: "destructive",
         });
       } else {
         toast({
-          title: isSignUp ? "Compte créé avec succès" : "Connexion réussie",
+          title: isSignUp ? "Konto erfolgreich erstellt" : "Anmeldung erfolgreich",
           description: isSignUp 
-            ? "Vérifiez votre email pour confirmer votre compte"
-            : "Vous êtes maintenant connecté",
+            ? "Überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen"
+            : "Sie sind jetzt angemeldet",
         });
         
         if (!isSignUp) {
@@ -56,8 +56,8 @@ const Auth = () => {
       }
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Une erreur inattendue s'est produite",
+        title: "Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
         variant: "destructive",
       });
     } finally {
@@ -74,30 +74,30 @@ const Auth = () => {
           <Card>
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-luxury-black">
-                {isSignUp ? 'Créer un compte' : 'Se connecter'}
+                {isSignUp ? 'Konto erstellen' : 'Anmelden'}
               </CardTitle>
               <CardDescription>
                 {isSignUp 
-                  ? 'Créez votre compte pour accéder à nos services'
-                  : 'Connectez-vous à votre compte'
+                  ? 'Erstellen Sie Ihr Konto, um auf unsere Dienste zuzugreifen'
+                  : 'Melden Sie sich in Ihrem Konto an'
                 }
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">E-Mail</Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="votre@email.com"
+                    placeholder="ihre@email.com"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password">Mot de passe</Label>
+                  <Label htmlFor="password">Passwort</Label>
                   <Input
                     id="password"
                     type="password"
@@ -114,8 +114,8 @@ const Auth = () => {
                   disabled={loading}
                 >
                   {loading 
-                    ? 'Chargement...' 
-                    : isSignUp ? 'Créer le compte' : 'Se connecter'
+                    ? 'Lädt...' 
+                    : isSignUp ? 'Konto erstellen' : 'Anmelden'
                   }
                 </Button>
               </form>
@@ -128,8 +128,8 @@ const Auth = () => {
                   className="text-luxury-black"
                 >
                   {isSignUp 
-                    ? 'Déjà un compte ? Se connecter'
-                    : 'Pas de compte ? Créer un compte'
+                    ? 'Bereits ein Konto? Anmelden'
+                    : 'Kein Konto? Konto erstellen'
                   }
                 </Button>
               </div>

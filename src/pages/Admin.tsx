@@ -36,6 +36,12 @@ interface Vehicle {
   rating: number;
   location: string;
   availability: string;
+  mileage: number;
+  fuel: string;
+  power: string;
+  transmission: string;
+  color: string;
+  description: string;
 }
 
 const Admin = () => {
@@ -65,12 +71,12 @@ const Admin = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching vehicles:", error);
+        console.error("Fehler beim Laden der Fahrzeuge:", error);
       } else {
         setVehicles(data || []);
       }
     } catch (error) {
-      console.error("Error fetching vehicles:", error);
+      console.error("Fehler beim Laden der Fahrzeuge:", error);
     }
   };
 
@@ -81,12 +87,12 @@ const Admin = () => {
         .select('*');
 
       if (error) {
-        console.error("Error fetching profiles:", error);
+        console.error("Fehler beim Laden der Profile:", error);
       } else {
         setProfiles(data || []);
       }
     } catch (error) {
-      console.error("Error fetching profiles:", error);
+      console.error("Fehler beim Laden der Profile:", error);
     }
   };
 
@@ -98,24 +104,24 @@ const Admin = () => {
         .eq('id', vehicleId);
 
       if (error) {
-        console.error("Error deleting vehicle:", error);
+        console.error("Fehler beim Löschen des Fahrzeugs:", error);
         toast({
-          title: "Error",
-          description: "Failed to delete vehicle.",
+          title: "Fehler",
+          description: "Fahrzeug konnte nicht gelöscht werden.",
           variant: "destructive",
         });
       } else {
         setVehicles(vehicles.filter(vehicle => vehicle.id !== vehicleId));
         toast({
-          title: "Success",
-          description: "Vehicle deleted successfully.",
+          title: "Erfolg",
+          description: "Fahrzeug erfolgreich gelöscht.",
         });
       }
     } catch (error) {
-      console.error("Error deleting vehicle:", error);
+      console.error("Fehler beim Löschen des Fahrzeugs:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete vehicle.",
+        title: "Fehler",
+        description: "Fahrzeug konnte nicht gelöscht werden.",
         variant: "destructive",
       });
     }
@@ -149,7 +155,7 @@ const Admin = () => {
                 <CardTitle className="text-2xl font-bold">Admin Dashboard</CardTitle>
                 <Badge variant="secondary">
                   <Settings className="h-4 w-4 mr-2" />
-                  Admin Access
+                  Admin Zugang
                 </Badge>
               </CardHeader>
               <CardContent>
@@ -157,23 +163,23 @@ const Admin = () => {
                   <TabsList>
                     <TabsTrigger value="vehicles" onClick={() => setActiveTab("vehicles")}>
                       <Car className="h-4 w-4 mr-2" />
-                      Vehicles
+                      Fahrzeuge
                     </TabsTrigger>
                     <TabsTrigger value="users" onClick={() => setActiveTab("users")}>
                       <Users className="h-4 w-4 mr-2" />
-                      Users
+                      Benutzer
                     </TabsTrigger>
                     <TabsTrigger value="reports" onClick={() => setActiveTab("reports")}>
                       <BarChart3 className="h-4 w-4 mr-2" />
-                      Reports
+                      Berichte
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="vehicles" className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <CardTitle>Vehicle Management</CardTitle>
+                      <CardTitle>Fahrzeugverwaltung</CardTitle>
                       <Button onClick={handleOpenVehicleForm}>
                         <Plus className="h-4 w-4 mr-2" />
-                        Add Vehicle
+                        Fahrzeug hinzufügen
                       </Button>
                     </div>
                     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -191,8 +197,8 @@ const Admin = () => {
                               alt={`${vehicle.brand} ${vehicle.model}`}
                               className="w-full h-48 object-cover mb-4 rounded-md"
                             />
-                            <p className="text-gray-600">Year: {vehicle.year}</p>
-                            <p className="text-gray-600">Price: €{vehicle.price}</p>
+                            <p className="text-gray-600">Jahr: {vehicle.year}</p>
+                            <p className="text-gray-600">Preis: €{vehicle.price}</p>
                             <div className="flex justify-end space-x-2 mt-4">
                               <Button
                                 variant="secondary"
@@ -200,7 +206,7 @@ const Admin = () => {
                                 onClick={() => handleEditVehicle(vehicle)}
                               >
                                 <Edit className="h-4 w-4 mr-2" />
-                                Edit
+                                Bearbeiten
                               </Button>
                               <Button
                                 variant="destructive"
@@ -208,7 +214,7 @@ const Admin = () => {
                                 onClick={() => handleDeleteVehicle(vehicle.id)}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
+                                Löschen
                               </Button>
                             </div>
                           </CardContent>
@@ -217,7 +223,7 @@ const Admin = () => {
                     </div>
                   </TabsContent>
                   <TabsContent value="users" className="space-y-4">
-                    <CardTitle>User Management</CardTitle>
+                    <CardTitle>Benutzerverwaltung</CardTitle>
                     <ul>
                       {profiles.map((profile: any) => (
                         <li key={profile.id} className="py-2 border-b border-gray-200">
@@ -227,8 +233,8 @@ const Admin = () => {
                     </ul>
                   </TabsContent>
                   <TabsContent value="reports" className="space-y-4">
-                    <CardTitle>Reports and Analytics</CardTitle>
-                    <p>Coming Soon...</p>
+                    <CardTitle>Berichte und Analysen</CardTitle>
+                    <p>Demnächst verfügbar...</p>
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -246,7 +252,7 @@ const Admin = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-2xl font-bold">
-                  {editingVehicle ? "Edit Vehicle" : "Add Vehicle"}
+                  {editingVehicle ? "Fahrzeug bearbeiten" : "Fahrzeug hinzufügen"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
