@@ -3,33 +3,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Upload, CreditCard, Info } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-
-const paymentSchema = z.object({
-  customerName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  customerEmail: z.string().email('Email invalide'),
-  customerPhone: z.string().min(10, 'Numéro de téléphone invalide'),
-  paymentMethod: z.enum(['monthly', 'full'], {
-    required_error: 'Veuillez sélectionner un mode de paiement',
-  }),
-  paymentProof: z.any().refine((file) => file?.length > 0, 'La preuve de paiement est obligatoire'),
-  bankDetails: z.string().min(10, 'Les détails bancaires sont requis'),
-  termsAccepted: z.boolean().refine((val) => val === true, 'Vous devez accepter les conditions'),
-});
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { CreditCard, User, Mail, Phone, MapPin, Calendar, Lock } from 'lucide-react';
 
 interface PaymentFormProps {
   totalAmount: number;
@@ -38,240 +14,285 @@ interface PaymentFormProps {
   onCancel: () => void;
 }
 
-const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: PaymentFormProps) => {
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const { toast } = useToast();
-
-  const form = useForm<z.infer<typeof paymentSchema>>({
-    resolver: zodResolver(paymentSchema),
-    defaultValues: {
-      customerName: '',
-      customerEmail: '',
-      customerPhone: '',
-      paymentMethod: 'monthly',
-      bankDetails: '',
-      termsAccepted: false,
-    },
+const PaymentForm: React.FC<PaymentFormProps> = ({
+  totalAmount,
+  depositAmount,
+  onSubmit,
+  onCancel
+}) => {
+  const [formData, setFormData] = useState({
+    // Personal Information
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    
+    // Address
+    street: '',
+    city: '',
+    zipCode: '',
+    country: 'Deutschland',
+    
+    // Payment Information
+    cardNumber: '',
+    expiryMonth: '',
+    expiryYear: '',
+    cvv: '',
+    cardName: ''
   });
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.type.startsWith('image/') || file.type === 'application/pdf') {
-        setUploadedFile(file);
-        form.setValue('paymentProof', [file]);
-        toast({
-          title: "Fichier téléchargé",
-          description: `${file.name} a été téléchargé avec succès.`,
-        });
-      } else {
-        toast({
-          title: "Type de fichier non supporté",
-          description: "Veuillez télécharger une image ou un PDF.",
-          variant: "destructive",
-        });
-      }
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const handleSubmit = (values: z.infer<typeof paymentSchema>) => {
-    const formData = {
-      ...values,
-      paymentProof: uploadedFile,
-      totalAmount,
-      depositAmount,
-      remainingAmount: totalAmount - depositAmount,
-    };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     onSubmit(formData);
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-        <div className="flex items-center space-x-2 mb-2">
-          <Info className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-blue-800">Informations de Paiement</h3>
-        </div>
-        <div className="space-y-2 text-sm text-blue-700">
-          <p><strong>Total de la commande:</strong> €{totalAmount.toLocaleString()}</p>
-          <p><strong>Acompte requis (20%):</strong> €{depositAmount.toLocaleString()}</p>
-          <p><strong>Reste à payer:</strong> €{(totalAmount - depositAmount).toLocaleString()}</p>
-        </div>
-      </div>
-
-      <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-        <h4 className="font-semibold text-yellow-800 mb-2">Coordonnées Bancaires pour le Virement</h4>
-        <div className="text-sm text-yellow-700 space-y-1">
-          <p><strong>IBAN:</strong> DE89 3704 0044 0532 0130 00</p>
-          <p><strong>BIC:</strong> COBADEFFXXX</p>
-          <p><strong>Banque:</strong> Commerzbank AG</p>
-          <p><strong>Titulaire:</strong> LuxeAuto GmbH</p>
-          <p><strong>Référence:</strong> Acompte commande [votre nom]</p>
-        </div>
-      </div>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="customerName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nom complet *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Votre nom complet" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="customerEmail"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email *</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="votre@email.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="customerPhone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Téléphone *</FormLabel>
-                <FormControl>
-                  <Input placeholder="+33 1 23 45 67 89" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="paymentMethod"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Mode de paiement du solde</FormLabel>
-                <FormControl>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="monthly"
-                        value="monthly"
-                        checked={field.value === 'monthly'}
-                        onChange={() => field.onChange('monthly')}
-                        className="h-4 w-4"
-                      />
-                      <Label htmlFor="monthly">Paiement mensuel (12 mois sans intérêt)</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="full"
-                        value="full"
-                        checked={field.value === 'full'}
-                        onChange={() => field.onChange('full')}
-                        className="h-4 w-4"
-                      />
-                      <Label htmlFor="full">Paiement total à la livraison</Label>
-                    </div>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="bankDetails"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Détails bancaires complémentaires</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="Informations supplémentaires sur votre virement (référence utilisée, banque, etc.)"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="paymentProof"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preuve de paiement de l'acompte *</FormLabel>
-                <FormControl>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600">
-                        Téléchargez une capture d'écran ou un reçu de votre virement bancaire
-                      </p>
-                      <Input
-                        type="file"
-                        accept="image/*,.pdf"
-                        onChange={handleFileUpload}
-                        className="cursor-pointer"
-                      />
-                      {uploadedFile && (
-                        <p className="text-sm text-green-600 font-medium">
-                          ✓ Fichier téléchargé: {uploadedFile.name}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="termsAccepted"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="text-sm">
-                    J'accepte les conditions de vente et confirme que l'acompte de €{depositAmount.toLocaleString()} a été versé *
-                  </FormLabel>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="flex space-x-4 pt-4">
-            <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
-              Annuler
-            </Button>
-            <Button type="submit" className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black">
-              <CreditCard className="mr-2 h-4 w-4" />
-              Confirmer la commande
-            </Button>
+      {/* Order Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <CreditCard className="h-5 w-5" />
+            <span>Bestellzusammenfassung</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex justify-between">
+            <span>Gesamtbetrag:</span>
+            <span className="font-semibold">€{totalAmount.toLocaleString()}</span>
           </div>
-        </form>
-      </Form>
+          <div className="flex justify-between text-luxury-gold">
+            <span>Anzahlung (20%):</span>
+            <span className="font-bold">€{depositAmount.toLocaleString()}</span>
+          </div>
+          <Separator />
+          <div className="text-sm text-gray-600">
+            <p>• Restbetrag: €{(totalAmount - depositAmount).toLocaleString()} bei Lieferung</p>
+            <p>• Oder zinslose Ratenzahlung möglich (6-84 Monate)</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Personal Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <User className="h-5 w-5" />
+              <span>Persönliche Informationen</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName">Vorname *</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  required
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName">Nachname *</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  required
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="email" className="flex items-center space-x-1">
+                  <Mail className="h-4 w-4" />
+                  <span>E-Mail *</span>
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone" className="flex items-center space-x-1">
+                  <Phone className="h-4 w-4" />
+                  <span>Telefon *</span>
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Address */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <MapPin className="h-5 w-5" />
+              <span>Lieferadresse</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="street">Straße und Hausnummer *</Label>
+              <Input
+                id="street"
+                type="text"
+                required
+                value={formData.street}
+                onChange={(e) => handleInputChange('street', e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="zipCode">Postleitzahl *</Label>
+                <Input
+                  id="zipCode"
+                  type="text"
+                  required
+                  value={formData.zipCode}
+                  onChange={(e) => handleInputChange('zipCode', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="city">Stadt *</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  required
+                  value={formData.city}
+                  onChange={(e) => handleInputChange('city', e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="country">Land</Label>
+              <Input
+                id="country"
+                type="text"
+                value={formData.country}
+                onChange={(e) => handleInputChange('country', e.target.value)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Payment Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Lock className="h-5 w-5" />
+              <span>Zahlungsinformationen</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="cardName">Name auf der Karte *</Label>
+              <Input
+                id="cardName"
+                type="text"
+                required
+                value={formData.cardName}
+                onChange={(e) => handleInputChange('cardName', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="cardNumber">Kartennummer *</Label>
+              <Input
+                id="cardNumber"
+                type="text"
+                required
+                placeholder="1234 5678 9012 3456"
+                value={formData.cardNumber}
+                onChange={(e) => handleInputChange('cardNumber', e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="expiryMonth" className="flex items-center space-x-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>Monat *</span>
+                </Label>
+                <Input
+                  id="expiryMonth"
+                  type="text"
+                  required
+                  placeholder="MM"
+                  maxLength={2}
+                  value={formData.expiryMonth}
+                  onChange={(e) => handleInputChange('expiryMonth', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="expiryYear">Jahr *</Label>
+                <Input
+                  id="expiryYear"
+                  type="text"
+                  required
+                  placeholder="JJ"
+                  maxLength={2}
+                  value={formData.expiryYear}
+                  onChange={(e) => handleInputChange('expiryYear', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="cvv">CVV *</Label>
+                <Input
+                  id="cvv"
+                  type="text"
+                  required
+                  placeholder="123"
+                  maxLength={4}
+                  value={formData.cvv}
+                  onChange={(e) => handleInputChange('cvv', e.target.value)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="flex-1"
+          >
+            Abbrechen
+          </Button>
+          <Button
+            type="submit"
+            className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black"
+          >
+            Anzahlung bezahlen (€{depositAmount.toLocaleString()})
+          </Button>
+        </div>
+      </form>
+
+      <div className="text-xs text-gray-500 text-center space-y-1">
+        <p>🔒 Ihre Zahlungsdaten werden sicher verschlüsselt übertragen</p>
+        <p>Sie erhalten eine Bestätigungs-E-Mail nach dem Abschluss Ihrer Bestellung</p>
+      </div>
     </div>
   );
 };
