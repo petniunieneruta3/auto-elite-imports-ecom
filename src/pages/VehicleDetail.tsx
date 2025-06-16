@@ -80,14 +80,14 @@ const VehicleDetail = () => {
             mileage: 15000,
             fuel: 'Benzin',
             power: '625 PS',
-            transmission: 'Automatique',
-            color: 'Noir',
+            transmission: 'Automatik',
+            color: 'Schwarz',
             image_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
             badge: 'Elite',
             rating: 4.9,
             location: 'Oranienburg',
             availability: 'Sofort verfügbar',
-            description: 'Magnifique BMW M5 Competition de 2022 en excellent état. Ce véhicule premium combine performance, luxe et fiabilité pour une expérience de conduite exceptionnelle.'
+            description: 'Wunderschöner BMW M5 Competition von 2022 in exzellentem Zustand. Dieses Premium-Fahrzeug kombiniert Leistung, Luxus und Zuverlässigkeit für ein außergewöhnliches Fahrerlebnis.'
           },
           'demo-2': {
             id: 'demo-2',
@@ -98,14 +98,14 @@ const VehicleDetail = () => {
             mileage: 8500,
             fuel: 'Benzin',
             power: '630 PS',
-            transmission: 'Automatique',
-            color: 'Argent',
+            transmission: 'Automatik',
+            color: 'Silber',
             image_url: 'https://images.unsplash.com/photo-1563694983011-6f4d90358083?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
             badge: 'Collector',
             rating: 5.0,
             location: 'Oranienburg',
             availability: 'Sofort verfügbar',
-            description: 'Mercedes AMG GT 63 S 2023, véhicule d\'exception alliant puissance et élégance.'
+            description: 'Mercedes AMG GT 63 S 2023, außergewöhnliches Fahrzeug, das Kraft und Eleganz vereint.'
           },
           'demo-3': {
             id: 'demo-3',
@@ -116,14 +116,14 @@ const VehicleDetail = () => {
             mileage: 5200,
             fuel: 'Benzin',
             power: '650 PS',
-            transmission: 'Automatique',
-            color: 'Rouge',
+            transmission: 'Automatik',
+            color: 'Rot',
             image_url: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
             badge: 'Collector',
             rating: 5.0,
             location: 'Oranienburg',
             availability: 'Sofort verfügbar',
-            description: 'Porsche 911 Turbo S 2023, le summum de la performance sportive allemande.'
+            description: 'Porsche 911 Turbo S 2023, der Höhepunkt deutscher Sportwagenleistung.'
           },
           'demo-4': {
             id: 'demo-4',
@@ -134,14 +134,14 @@ const VehicleDetail = () => {
             mileage: 12000,
             fuel: 'Benzin',
             power: '600 PS',
-            transmission: 'Automatique',
-            color: 'Bleu',
+            transmission: 'Automatik',
+            color: 'Blau',
             image_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
             badge: 'Elite',
             rating: 4.8,
             location: 'Oranienburg',
             availability: 'Sofort verfügbar',
-            description: 'Audi RS6 Avant 2022, le break sportif par excellence.'
+            description: 'Audi RS6 Avant 2022, der Sportwagen-Kombi schlechthin.'
           }
         };
         
@@ -169,8 +169,8 @@ const VehicleDetail = () => {
     } catch (error) {
       console.error('Error fetching vehicle:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les détails du véhicule.",
+        title: "Fehler",
+        description: "Fahrzeugdetails konnten nicht geladen werden.",
         variant: "destructive",
       });
     } finally {
@@ -190,16 +190,16 @@ const VehicleDetail = () => {
       });
       
       toast({
-        title: "Ajouté au panier",
-        description: `${vehicle.brand} ${vehicle.model} a été ajouté à votre panier.`,
+        title: "Zum Warenkorb hinzugefügt",
+        description: `${vehicle.brand} ${vehicle.model} wurde zu Ihrem Warenkorb hinzugefügt.`,
       });
     }
   };
 
   const handleContact = () => {
     toast({
-      title: "Contact",
-      description: "Redirection vers la page de contact...",
+      title: "Kontakt",
+      description: "Weiterleitung zur Kontaktseite...",
     });
     navigate('/contact');
   };
@@ -209,7 +209,7 @@ const VehicleDetail = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-luxury-gold mx-auto"></div>
-          <p className="mt-4 text-luxury-gray">Chargement des détails...</p>
+          <p className="mt-4 text-luxury-gray">Details werden geladen...</p>
         </div>
       </div>
     );
@@ -221,10 +221,10 @@ const VehicleDetail = () => {
         <Header />
         <main className="pt-20 py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-2xl font-bold text-luxury-black mb-4">Véhicule non trouvé</h1>
-            <p className="text-luxury-gray mb-6">Le véhicule que vous recherchez n'existe pas ou n'est plus disponible.</p>
+            <h1 className="text-2xl font-bold text-luxury-black mb-4">Fahrzeug nicht gefunden</h1>
+            <p className="text-luxury-gray mb-6">Das gesuchte Fahrzeug existiert nicht oder ist nicht mehr verfügbar.</p>
             <Button onClick={() => navigate('/catalog')} className="bg-luxury-gold hover:bg-luxury-dark-gold text-black">
-              Retour au catalogue
+              Zurück zum Katalog
             </Button>
           </div>
         </main>
@@ -247,7 +247,7 @@ const VehicleDetail = () => {
               className="text-luxury-gray hover:text-luxury-black"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour au catalogue
+              Zurück zum Katalog
             </Button>
           </div>
         </section>
@@ -312,30 +312,30 @@ const VehicleDetail = () => {
 
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="text-xl font-bold text-luxury-black mb-4">Caractéristiques</h3>
+                    <h3 className="text-xl font-bold text-luxury-black mb-4">Eigenschaften</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-medium text-luxury-gray">Kilomètres:</span>
+                        <span className="font-medium text-luxury-gray">Kilometerstand:</span>
                         <p className="font-semibold">{vehicle.mileage.toLocaleString()} km</p>
                       </div>
                       <div>
-                        <span className="font-medium text-luxury-gray">Carburant:</span>
+                        <span className="font-medium text-luxury-gray">Kraftstoff:</span>
                         <p className="font-semibold">{vehicle.fuel}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-luxury-gray">Puissance:</span>
+                        <span className="font-medium text-luxury-gray">Leistung:</span>
                         <p className="font-semibold">{vehicle.power}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-luxury-gray">Transmission:</span>
+                        <span className="font-medium text-luxury-gray">Getriebe:</span>
                         <p className="font-semibold">{vehicle.transmission}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-luxury-gray">Couleur:</span>
+                        <span className="font-medium text-luxury-gray">Farbe:</span>
                         <p className="font-semibold">{vehicle.color}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-luxury-gray">Année:</span>
+                        <span className="font-medium text-luxury-gray">Baujahr:</span>
                         <p className="font-semibold">{vehicle.year}</p>
                       </div>
                     </div>
@@ -344,9 +344,9 @@ const VehicleDetail = () => {
 
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="text-xl font-bold text-luxury-black mb-4">Description</h3>
+                    <h3 className="text-xl font-bold text-luxury-black mb-4">Beschreibung</h3>
                     <p className="text-luxury-gray leading-relaxed">
-                      {vehicle.description || `Magnifique ${vehicle.brand} ${vehicle.model} de ${vehicle.year} en excellent état. Ce véhicule premium combine performance, luxe et fiabilité pour une expérience de conduite exceptionnelle.`}
+                      {vehicle.description || `Wunderschöner ${vehicle.brand} ${vehicle.model} von ${vehicle.year} in exzellentem Zustand. Dieses Premium-Fahrzeug kombiniert Leistung, Luxus und Zuverlässigkeit für ein außergewöhnliches Fahrerlebnis.`}
                     </p>
                   </CardContent>
                 </Card>
@@ -359,7 +359,7 @@ const VehicleDetail = () => {
                         <span className="text-3xl font-bold text-luxury-black">
                           €{vehicle.price.toLocaleString()}
                         </span>
-                        <p className="text-luxury-gray">Prix fixe, TTC</p>
+                        <p className="text-luxury-gray">Festpreis, inkl. MwSt.</p>
                       </div>
                     </div>
                     
@@ -370,7 +370,7 @@ const VehicleDetail = () => {
                         size="lg"
                       >
                         <ShoppingCart className="h-5 w-5 mr-2" />
-                        Ajouter au panier
+                        Zum Warenkorb hinzufügen
                       </Button>
                       
                       <div className="grid grid-cols-2 gap-3">
@@ -380,7 +380,7 @@ const VehicleDetail = () => {
                           className="border-luxury-black text-luxury-black hover:bg-luxury-black hover:text-white"
                         >
                           <Phone className="h-4 w-4 mr-2" />
-                          Appeler
+                          Anrufen
                         </Button>
                         <Button 
                           onClick={handleContact}
@@ -388,7 +388,7 @@ const VehicleDetail = () => {
                           className="border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-black"
                         >
                           <Mail className="h-4 w-4 mr-2" />
-                          Email
+                          E-Mail
                         </Button>
                       </div>
                     </div>

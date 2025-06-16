@@ -50,7 +50,7 @@ const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles }) => {
             onClick={handleShowMore}
             className="bg-luxury-gold hover:bg-luxury-dark-gold text-black font-medium px-8 py-3 transition-all duration-300"
           >
-            Voir plus de véhicules
+            Mehr Fahrzeuge anzeigen
           </Button>
         </div>
       )}

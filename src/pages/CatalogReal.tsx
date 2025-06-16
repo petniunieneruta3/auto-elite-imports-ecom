@@ -157,7 +157,7 @@ const VehicleCard = ({ vehicle, viewMode, onAddToCart, onViewDetails, onCompare 
               variant="outline"
               className="border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-black transition-all duration-300"
             >
-              Détails
+              Details
             </Button>
             <Button 
               size="sm"
@@ -165,7 +165,7 @@ const VehicleCard = ({ vehicle, viewMode, onAddToCart, onViewDetails, onCompare 
               className="bg-luxury-gold hover:bg-luxury-dark-gold text-black transition-all duration-300"
             >
               <ShoppingCart className="h-4 w-4 mr-1" />
-              Panier
+              Warenkorb
             </Button>
           </div>
         </div>
