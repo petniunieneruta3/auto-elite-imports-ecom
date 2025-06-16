@@ -15,7 +15,7 @@ const Header = () => {
   const { getTotalItems, setIsOpen } = useCart();
 
   const navItems = [
-    { name: 'Accueil', path: '/' },
+    { name: 'Startseite', path: '/' },
     { name: 'Katalog', path: '/catalog' },
     { name: 'Dienstleistungen', path: '/services' },
     { name: 'Finanzierung', path: '/financing' },
@@ -47,7 +47,7 @@ const Header = () => {
             <div className="flex items-center space-x-4">
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-luxury-black">Bienvenue, {user.email}</span>
+                  <span className="text-luxury-black">Willkommen, {user.email}</span>
                   {isAdmin && (
                     <Button
                       variant="ghost"
@@ -66,7 +66,7 @@ const Header = () => {
                     className="text-gray-600 hover:text-luxury-gold"
                   >
                     <LogOut className="h-4 w-4 mr-1" />
-                    Déconnexion
+                    Abmelden
                   </Button>
                 </div>
               ) : (
@@ -77,7 +77,7 @@ const Header = () => {
                   className="text-luxury-gold hover:text-luxury-dark-gold"
                 >
                   <User className="h-4 w-4 mr-1" />
-                  Connexion
+                  Anmelden
                 </Button>
               )}
             </div>
@@ -190,7 +190,7 @@ const Header = () => {
               
               {user ? (
                 <div className="space-y-2 pt-4 border-t border-gray-200">
-                  <div className="text-sm text-gray-600">Connecté en tant que {user.email}</div>
+                  <div className="text-sm text-gray-600">Angemeldet als {user.email}</div>
                   {isAdmin && (
                     <button
                       onClick={() => {
@@ -209,7 +209,7 @@ const Header = () => {
                     }}
                     className="block w-full text-left text-gray-600 hover:text-luxury-gold font-medium py-2"
                   >
-                    Déconnexion
+                    Abmelden
                   </button>
                 </div>
               ) : (
@@ -220,7 +220,7 @@ const Header = () => {
                   }}
                   className="block w-full text-left text-luxury-gold hover:text-luxury-dark-gold font-medium py-2"
                 >
-                  Connexion
+                  Anmelden
                 </button>
               )}
               

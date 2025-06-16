@@ -39,8 +39,8 @@ const CartDrawer = () => {
     console.log('Payment data:', paymentData);
     
     toast({
-      title: "Commande confirmée",
-      description: `Votre commande de ${items.length} article(s) a été confirmée. Nous traitons votre acompte de €${depositAmount.toLocaleString()}.`,
+      title: "Bestellung bestätigt",
+      description: `Ihre Bestellung über ${items.length} Artikel wurde bestätigt. Wir bearbeiten Ihre Anzahlung von €${depositAmount.toLocaleString()}.`,
     });
     
     // Clear the cart and close forms
@@ -72,10 +72,10 @@ const CartDrawer = () => {
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <DrawerTitle>Paiement de la commande</DrawerTitle>
+                <DrawerTitle>Bestellungsabwicklung</DrawerTitle>
               </>
             ) : (
-              <DrawerTitle>Panier ({items.length})</DrawerTitle>
+              <DrawerTitle>Warenkorb ({items.length})</DrawerTitle>
             )}
             <DrawerClose asChild>
               <Button variant="ghost" size="icon">
@@ -97,9 +97,9 @@ const CartDrawer = () => {
             <>
               {items.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">Votre panier est vide</p>
+                  <p className="text-gray-500 mb-4">Ihr Warenkorb ist leer</p>
                   <DrawerClose asChild>
-                    <Button variant="outline">Continuer les achats</Button>
+                    <Button variant="outline">Weiter einkaufen</Button>
                   </DrawerClose>
                 </div>
               ) : (
@@ -162,11 +162,11 @@ const CartDrawer = () => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-lg font-bold">
-                  <span>Total:</span>
+                  <span>Gesamt:</span>
                   <span className="text-luxury-gold">€{getTotalPrice().toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm text-gray-600">
-                  <span>Acompte requis (20%):</span>
+                  <span>Erforderliche Anzahlung (20%):</span>
                   <span className="font-semibold">€{depositAmount.toLocaleString()}</span>
                 </div>
               </div>
@@ -176,13 +176,13 @@ const CartDrawer = () => {
                   className="flex-1"
                   onClick={clearCart}
                 >
-                  Vider le panier
+                  Warenkorb leeren
                 </Button>
                 <Button 
                   className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black"
                   onClick={handleOrderClick}
                 >
-                  Procéder au paiement
+                  Zur Kasse gehen
                 </Button>
               </div>
             </div>

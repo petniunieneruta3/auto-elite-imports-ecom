@@ -83,7 +83,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
           onClick={handleViewDetails}
           className="w-full mt-4 bg-luxury-gold hover:bg-luxury-dark-gold text-black transition-all duration-300"
         >
-          Voir détails
+          Details ansehen
         </Button>
       </CardContent>
     </Card>
