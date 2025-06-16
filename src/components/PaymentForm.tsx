@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { CreditCard, User, Mail, Phone, MapPin, Building2, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import PaymentProofUpload from './PaymentProofUpload';
 
 interface PaymentFormProps {
   totalAmount: number;
@@ -36,6 +37,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     country: 'Deutschland',
   });
 
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+
   // Bank details for wire transfer
   const bankDetails = {
     bankName: "Deutsche Bank AG",
@@ -52,15 +55,47 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }));
   };
 
+  const handleProofUploaded = (file: File) => {
+    setPaymentProof(file);
+  };
+
+  const handleRemoveProof = () => {
+    setPaymentProof(null);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Add bank transfer reference to form data
+    // Validation: Check if all required fields are filled
+    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'zipCode'];
+    const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Fehlende Informationen",
+        description: "Bitte füllen Sie alle erforderlichen Felder aus.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validation: Check if payment proof is uploaded
+    if (!paymentProof) {
+      toast({
+        title: "Zahlungsnachweis erforderlich",
+        description: "Bitte laden Sie einen Nachweis Ihrer Überweisung hoch, bevor Sie die Bestellung bestätigen.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Add payment proof and bank transfer reference to form data
     const orderData = {
       ...formData,
       paymentMethod: 'bank_transfer',
       transferReference: bankDetails.reference,
-      amount: depositAmount
+      amount: depositAmount,
+      paymentProof: paymentProof
     };
     
     onSubmit(orderData);
@@ -72,6 +107,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       title: "Kopiert!",
       description: `${label} wurde in die Zwischenablage kopiert.`,
     });
+  };
+
+  const isFormValid = () => {
+    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'zipCode'];
+    const allFieldsFilled = requiredFields.every(field => formData[field as keyof typeof formData]);
+    return allFieldsFilled && paymentProof !== null;
   };
 
   return (
@@ -308,12 +349,19 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               </div>
             </div>
             <div className="text-sm text-gray-600 space-y-2">
-              <p>• Bitte überweisen Sie den Anzahlungsbetrag innerhalb von 7 Tagen.</p>
+              <p>• Bitte überweisen Sie den Anzahlungsbetrag und laden Sie anschließend den Nachweis hoch.</p>
               <p>• Verwenden Sie unbedingt den angegebenen Verwendungszweck für eine schnelle Zuordnung.</p>
-              <p>• Nach Zahlungseingang erhalten Sie eine Bestätigung und weitere Informationen zur Lieferung.</p>
+              <p>• Nach Überprüfung des Zahlungsnachweises erhalten Sie eine Bestätigung.</p>
             </div>
           </CardContent>
         </Card>
+
+        {/* Payment Proof Upload */}
+        <PaymentProofUpload
+          onProofUploaded={handleProofUploaded}
+          uploadedFile={paymentProof}
+          onRemoveFile={handleRemoveProof}
+        />
 
         {/* Action Buttons */}
         <div className="flex space-x-4">
@@ -327,16 +375,21 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </Button>
           <Button
             type="submit"
-            className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black"
+            disabled={!isFormValid()}
+            className={`flex-1 ${
+              isFormValid() 
+                ? 'bg-luxury-gold hover:bg-luxury-dark-gold text-black' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
           >
-            Bestellung bestätigen (€{depositAmount.toLocaleString()} überweisen)
+            Bestellung mit Nachweis bestätigen
           </Button>
         </div>
       </form>
 
       <div className="text-xs text-gray-500 text-center space-y-1">
-        <p>🏦 Überweisen Sie die Anzahlung sicher über Ihr Online-Banking</p>
-        <p>Sie erhalten eine Bestätigungs-E-Mail nach dem Abschluss Ihrer Bestellung</p>
+        <p>🏦 Überweisen Sie die Anzahlung und laden Sie den Nachweis hoch</p>
+        <p>Ihre Bestellung wird erst nach Überprüfung des Zahlungsnachweises bestätigt</p>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import {
@@ -37,16 +36,27 @@ const CartDrawer = () => {
 
   const handlePaymentSubmit = (paymentData: any) => {
     console.log('Payment data:', paymentData);
+    console.log('Payment proof file:', paymentData.paymentProof);
     
     toast({
-      title: "Bestellung bestätigt",
-      description: `Ihre Bestellung über ${items.length} Artikel wurde bestätigt. Wir bearbeiten Ihre Anzahlung von €${depositAmount.toLocaleString()}.`,
+      title: "Bestellung eingereicht",
+      description: `Ihre Bestellung über ${items.length} Artikel wurde eingereicht. Wir überprüfen Ihren Zahlungsnachweis und bestätigen Ihre Bestellung innerhalb von 24 Stunden.`,
+      duration: 8000,
     });
     
-    // Clear the cart and close forms
-    clearCart();
+    // Keep the cart items until order is actually confirmed by admin
+    // Only clear the forms and close the drawer
     setShowPaymentForm(false);
     setIsOpen(false);
+    
+    // Show additional confirmation message
+    setTimeout(() => {
+      toast({
+        title: "Bestätigung per E-Mail",
+        description: "Sie erhalten eine E-Mail-Bestätigung sobald wir Ihren Zahlungsnachweis überprüft haben.",
+        duration: 6000,
+      });
+    }, 2000);
   };
 
   const handlePaymentCancel = () => {
@@ -55,6 +65,15 @@ const CartDrawer = () => {
 
   const handleBackToCart = () => {
     setShowPaymentForm(false);
+  };
+
+  // Function to clear cart after successful order confirmation (would be called by admin system)
+  const handleOrderConfirmed = () => {
+    clearCart();
+    toast({
+      title: "Bestellung bestätigt",
+      description: "Ihre Bestellung wurde offiziell bestätigt. Vielen Dank für Ihr Vertrauen!",
+    });
   };
 
   return (
@@ -168,6 +187,9 @@ const CartDrawer = () => {
                 <div className="flex justify-between items-center text-sm text-gray-600">
                   <span>Erforderliche Anzahlung (20%):</span>
                   <span className="font-semibold">€{depositAmount.toLocaleString()}</span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  <p>* Fahrzeuge bleiben im Warenkorb bis zur Bestätigung der Zahlung</p>
                 </div>
               </div>
               <div className="flex space-x-2">
