@@ -42,6 +42,14 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
     }));
   };
 
+  const handleProofUploaded = (file: File) => {
+    setPaymentProof(file);
+  };
+
+  const handleRemoveFile = () => {
+    setPaymentProof(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -249,14 +257,11 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
       </Card>
 
       {/* Payment Proof Upload */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Zahlungsnachweis hochladen</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <PaymentProofUpload onFileSelect={setPaymentProof} />
-        </CardContent>
-      </Card>
+      <PaymentProofUpload 
+        onProofUploaded={handleProofUploaded}
+        uploadedFile={paymentProof}
+        onRemoveFile={handleRemoveFile}
+      />
 
       {/* Special Requests */}
       <Card>
