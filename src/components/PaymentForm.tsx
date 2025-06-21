@@ -41,10 +41,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   // Bank details for wire transfer
   const bankDetails = {
-    bankName: "Deutsche Bank AG",
-    iban: "DE89 3704 0044 0532 0130 00",
-    bic: "COBADEFFXXX",
-    accountHolder: "Luxury Cars GmbH",
+    bankName: "Poste Italiane",
+    iban: "IT50L3608105138218082418145",
+    bic: "PPAYITR1XXX",
+    accountHolder: "Giampaolo Cristofori",
+    transferType: "Instantané",
     reference: `ORDER-${Date.now()}`
   };
 
@@ -299,7 +300,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-medium">BIC:</span>
+                <span className="font-medium">BIC/SWIFT:</span>
                 <div className="flex items-center space-x-2">
                   <span className="font-mono">{bankDetails.bic}</span>
                   <Button
@@ -307,7 +308,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6"
-                    onClick={() => copyToClipboard(bankDetails.bic, 'BIC')}
+                    onClick={() => copyToClipboard(bankDetails.bic, 'BIC/SWIFT')}
                   >
                     <Copy className="h-3 w-3" />
                   </Button>
@@ -323,6 +324,21 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     size="icon"
                     className="h-6 w-6"
                     onClick={() => copyToClipboard(bankDetails.accountHolder, 'Empfänger')}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Type de transfert:</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-600 font-semibold">{bankDetails.transferType}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => copyToClipboard(bankDetails.transferType, 'Type de transfert')}
                   >
                     <Copy className="h-3 w-3" />
                   </Button>
@@ -351,6 +367,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <div className="text-sm text-gray-600 space-y-2">
               <p>• Bitte überweisen Sie den Anzahlungsbetrag und laden Sie anschließend den Nachweis hoch.</p>
               <p>• Verwenden Sie unbedingt den angegebenen Verwendungszweck für eine schnelle Zuordnung.</p>
+              <p>• Mit einem instantanen Transfer wird Ihr Geld sofort übertragen.</p>
               <p>• Nach Überprüfung des Zahlungsnachweises erhalten Sie eine Bestätigung.</p>
             </div>
           </CardContent>
