@@ -2,42 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import VehicleGrid from './VehicleGrid';
-import { addMercedesCLA } from '@/utils/addMercedesCLA';
-import { addMercedesCLA200d } from '@/utils/addMercedesCLA200d';
-import { addMercedesCLA200AMG } from '@/utils/addMercedesCLA200AMG';
-import { addMercedesCLA200AMGLine } from '@/utils/addMercedesCLA200AMGLine';
-import { addVolvoXC60 } from '@/utils/addVolvoXC60';
-import { addVolvoV90 } from '@/utils/addVolvoV90';
-import { addRenaultCaptur } from '@/utils/addRenaultCaptur';
-import { addRenaultArkana } from '@/utils/addRenaultArkana';
-import { addAudiQ8 } from '@/utils/addAudiQ8';
-import { addAudiQ3 } from '@/utils/addAudiQ3';
-import { addMercedesGLEAMG53 } from '@/utils/addMercedesGLEAMG53';
-import { addFordMustang } from '@/utils/addFordMustang';
-import { addMercedesG63AMG } from '@/utils/addMercedesG63AMG';
-import { addMercedesGLC43AMG } from '@/utils/addMercedesGLC43AMG';
-import { addMercedesGLE350d } from '@/utils/addMercedesGLE350d';
-import { addVolkswagenGolfGTE } from '@/utils/addVolkswagenGolfGTE';
-import { addVolkswagenGolfGTE2016 } from '@/utils/addVolkswagenGolfGTE2016';
-import { addBMWX3 } from '@/utils/addBMWX3';
-import { addBMWX4 } from '@/utils/addBMWX4';
-import { addMercedesGLA45SAMG } from '@/utils/addMercedesGLA45SAMG';
-import { addCitroenC4 } from '@/utils/addCitroenC4';
-import { addVolkswagenGolfRLine } from '@/utils/addVolkswagenGolfRLine';
-import { addPorscheCayenneCoupe } from '@/utils/addPorscheCayenneCoupe';
-import { addAudiA3Sportback } from '@/utils/addAudiA3Sportback';
-import { addFordMondeoHybrid } from '@/utils/addFordMondeoHybrid';
-import { addRangeRoverEvoque } from '@/utils/addRangeRoverEvoque';
-import { addMercedesA180d } from '@/utils/addMercedesA180d';
-import { addRangeRoverEvoqueRDynamic } from '@/utils/addRangeRoverEvoqueRDynamic';
-import { addBMWX2MSport } from '@/utils/addBMWX2MSport';
-import { addBMWX1MSport } from '@/utils/addBMWX1MSport';
-import { addAudiA5Gtron } from '@/utils/addAudiA5Gtron';
-import { addBMWM340d } from '@/utils/addBMWM340d';
-import { addVolkswagenGolfGTITCR } from '@/utils/addVolkswagenGolfGTITCR';
-import { addVolkswagenGolfGTI2021 } from '@/utils/addVolkswagenGolfGTI2021';
-import { addAudiS7Sportback } from '@/utils/addAudiS7Sportback';
-import { addRangeRoverEvoque2021 } from '@/utils/addRangeRoverEvoque2021';
 
 interface Vehicle {
   id: string;
@@ -79,61 +43,10 @@ const FeaturedVehicles: React.FC<FeaturedVehiclesProps> = ({ searchFilters }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('FeaturedVehicles: Component mounted, adding vehicles and fetching...');
+    console.log('FeaturedVehicles: Component mounted, fetching vehicles...');
     
-    // Add vehicles if they don't exist, then fetch vehicles
-    const initializeVehicles = async () => {
-      // Fetch existing vehicles first to show them immediately
-      await fetchFeaturedVehicles();
-      
-      // Then add missing vehicles in parallel in the background
-      const addVehiclePromises = [
-        addMercedesCLA(),
-        addMercedesCLA200d(),
-        addMercedesCLA200AMG(),
-        addMercedesCLA200AMGLine(),
-        addVolvoXC60(),
-        addVolvoV90(),
-        addRenaultCaptur(),
-        addRenaultArkana(),
-        addAudiQ8(),
-        addAudiQ3(),
-        addMercedesGLEAMG53(),
-        addFordMustang(),
-        addMercedesG63AMG(),
-        addMercedesGLC43AMG(),
-        addMercedesGLE350d(),
-        addVolkswagenGolfGTE(),
-        addVolkswagenGolfGTE2016(),
-        addBMWX3(),
-        addBMWX4(),
-        addMercedesGLA45SAMG(),
-        addCitroenC4(),
-        addVolkswagenGolfRLine(),
-        addPorscheCayenneCoupe(),
-        addAudiA3Sportback(),
-        addFordMondeoHybrid(),
-        addRangeRoverEvoque(),
-        addMercedesA180d(),
-        addRangeRoverEvoqueRDynamic(),
-        addBMWX2MSport(),
-        addBMWX1MSport(),
-        addAudiA5Gtron(),
-        addBMWM340d(),
-        addVolkswagenGolfGTITCR(),
-        addVolkswagenGolfGTI2021(),
-        addAudiS7Sportback(),
-        addRangeRoverEvoque2021()
-      ];
-
-      // Execute all vehicle additions in parallel
-      await Promise.all(addVehiclePromises);
-      
-      // Fetch vehicles again after all additions are complete
-      await fetchFeaturedVehicles();
-    };
-    
-    initializeVehicles();
+    // Fetch vehicles directly without adding predefined ones
+    fetchFeaturedVehicles();
     
     const channel = supabase
       .channel('vehicles')
@@ -163,14 +76,6 @@ const FeaturedVehicles: React.FC<FeaturedVehiclesProps> = ({ searchFilters }) =>
     try {
       console.log('FeaturedVehicles: Fetching featured vehicles with filters:', searchFilters);
       setLoading(true);
-      
-      // First, let's get a sample of the actual data to understand the format
-      const { data: sampleData } = await supabase
-        .from('vehicles')
-        .select('*')
-        .limit(5);
-        
-      console.log('FeaturedVehicles: Sample vehicle data from database:', sampleData);
       
       let query = supabase
         .from('vehicles')
