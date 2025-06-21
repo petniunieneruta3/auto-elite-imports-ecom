@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -35,7 +34,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('https://formspree.io/f/xzzggyqk', {
+      const response = await fetch('https://formspree.io/f/myzjdajk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,8 +46,7 @@ const Contact = () => {
           phone: formData.phone,
           subject: formData.subject,
           message: formData.message,
-          _replyto: formData.email,
-          _to: 'contact@autoimportexpor.com'
+          _replyto: formData.email
         }),
       });
 
