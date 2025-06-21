@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Instagram, MessageSquare, Phone, Mail, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +47,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-luxury-gold" />
-                <span>autoexport49@gmail.com</span>
+                <span>contact@autoimportexpor.com</span>
               </div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -134,7 +133,7 @@ const Contact = () => {
                       <Mail className="h-6 w-6 text-luxury-gold mt-1" />
                       <div>
                         <h3 className="font-medium text-luxury-black">E-Mail</h3>
-                        <p className="text-luxury-gray">autoexport49@gmail.com</p>
+                        <p className="text-luxury-gray">contact@autoimportexpor.com</p>
                       </div>
                     </div>
                     
