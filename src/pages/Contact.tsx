@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -46,6 +47,8 @@ const Contact = () => {
           phone: formData.phone,
           subject: formData.subject,
           message: formData.message,
+          _replyto: formData.email,
+          _to: 'contact@autoimportexpor.com'
         }),
       });
 

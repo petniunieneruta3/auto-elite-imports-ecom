@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, User, Mail, Phone, MapPin, Building2, Copy } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import PaymentProofUpload from './PaymentProofUpload';
+import { useToast } from '@/hooks/use-toast';
+import { useCart } from '@/contexts/CartContext';
 
 interface PaymentFormProps {
   totalAmount: number;
@@ -16,397 +18,297 @@ interface PaymentFormProps {
   onCancel: () => void;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({
-  totalAmount,
-  depositAmount,
-  onSubmit,
-  onCancel
-}) => {
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    // Personal Information
+const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: PaymentFormProps) => {
+  const [paymentType, setPaymentType] = useState('deposit');
+  const [customerInfo, setCustomerInfo] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    
-    // Address
-    street: '',
+    address: '',
     city: '',
-    zipCode: '',
-    country: 'Deutschland',
+    postalCode: '',
+    country: ''
   });
-
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
-
-  // Bank details for wire transfer
-  const bankDetails = {
-    bankName: "Poste Italiane",
-    iban: "IT50L3608105138218082418145",
-    bic: "PPAYITR1XXX",
-    accountHolder: "Giampaolo Cristofori",
-    transferType: "Instantané",
-    reference: `ORDER-${Date.now()}`
-  };
+  const [specialRequests, setSpecialRequests] = useState('');
+  const { toast } = useToast();
+  const { items } = useCart();
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setCustomerInfo(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleProofUploaded = (file: File) => {
-    setPaymentProof(file);
-  };
-
-  const handleRemoveProof = () => {
-    setPaymentProof(null);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation: Check if all required fields are filled
-    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'zipCode'];
-    const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
-    
-    if (missingFields.length > 0) {
+    if (!customerInfo.firstName || !customerInfo.lastName || !customerInfo.email) {
       toast({
-        title: "Fehlende Informationen",
-        description: "Bitte füllen Sie alle erforderlichen Felder aus.",
-        variant: "destructive"
+        title: "Fehler",
+        description: "Bitte füllen Sie alle Pflichtfelder aus.",
+        variant: "destructive",
       });
       return;
     }
 
-    // Validation: Check if payment proof is uploaded
     if (!paymentProof) {
       toast({
-        title: "Zahlungsnachweis erforderlich",
-        description: "Bitte laden Sie einen Nachweis Ihrer Überweisung hoch, bevor Sie die Bestellung bestätigen.",
-        variant: "destructive"
+        title: "Fehler", 
+        description: "Bitte laden Sie einen Zahlungsnachweis hoch.",
+        variant: "destructive",
       });
       return;
     }
-    
-    // Add payment proof and bank transfer reference to form data
-    const orderData = {
-      ...formData,
-      paymentMethod: 'bank_transfer',
-      transferReference: bankDetails.reference,
-      amount: depositAmount,
-      paymentProof: paymentProof
-    };
-    
-    onSubmit(orderData);
-  };
 
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Kopiert!",
-      description: `${label} wurde in die Zwischenablage kopiert.`,
+    const paymentAmount = paymentType === 'deposit' ? depositAmount : totalAmount;
+    
+    // Prepare order summary
+    const orderSummary = items.map(item => 
+      `${item.brand} ${item.model} (${item.year}) - Menge: ${item.quantity} - Preis: €${item.price.toLocaleString()}`
+    ).join('\n');
+
+    // Send email notification to business
+    try {
+      const response = await fetch('https://formspree.io/f/xzzggyqk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          _to: 'contact@autoimportexpor.com',
+          _subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
+          customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+          customerEmail: customerInfo.email,
+          customerPhone: customerInfo.phone,
+          customerAddress: `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.postalCode}, ${customerInfo.country}`,
+          paymentType: paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung',
+          paymentAmount: `€${paymentAmount.toLocaleString()}`,
+          totalOrderValue: `€${totalAmount.toLocaleString()}`,
+          orderSummary: orderSummary,
+          specialRequests: specialRequests || 'Keine besonderen Anfragen',
+          orderDate: new Date().toLocaleDateString('de-DE'),
+          orderTime: new Date().toLocaleTimeString('de-DE')
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Order notification sent successfully');
+      } else {
+        console.error('Failed to send order notification');
+      }
+    } catch (error) {
+      console.error('Error sending order notification:', error);
+    }
+
+    // Call the onSubmit callback with all the data
+    onSubmit({
+      customerInfo,
+      paymentType,
+      paymentAmount,
+      totalAmount,
+      paymentProof,
+      specialRequests,
+      items,
+      orderSummary
     });
   };
 
-  const isFormValid = () => {
-    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'zipCode'];
-    const allFieldsFilled = requiredFields.every(field => formData[field as keyof typeof formData]);
-    return allFieldsFilled && paymentProof !== null;
-  };
+  const paymentAmount = paymentType === 'deposit' ? depositAmount : totalAmount;
 
   return (
     <div className="space-y-6">
-      {/* Order Summary */}
+      {/* Customer Information */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <CreditCard className="h-5 w-5" />
-            <span>Bestellzusammenfassung</span>
-          </CardTitle>
+          <CardTitle>Kundendaten</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex justify-between">
-            <span>Gesamtbetrag:</span>
-            <span className="font-semibold">€{totalAmount.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-luxury-gold">
-            <span>Anzahlung per Überweisung (20%):</span>
-            <span className="font-bold">€{depositAmount.toLocaleString()}</span>
-          </div>
-          <Separator />
-          <div className="text-sm text-gray-600">
-            <p>• Restbetrag: €{(totalAmount - depositAmount).toLocaleString()} bei Lieferung</p>
-            <p>• Oder zinslose Ratenzahlung möglich (6-84 Monate)</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Personal Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <User className="h-5 w-5" />
-              <span>Persönliche Informationen</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">Vorname *</Label>
-                <Input
-                  id="firstName"
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName">Nachname *</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="email" className="flex items-center space-x-1">
-                  <Mail className="h-4 w-4" />
-                  <span>E-Mail *</span>
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone" className="flex items-center space-x-1">
-                  <Phone className="h-4 w-4" />
-                  <span>Telefon *</span>
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Address */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <MapPin className="h-5 w-5" />
-              <span>Lieferadresse</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="street">Straße und Hausnummer *</Label>
+              <Label htmlFor="firstName">Vorname *</Label>
               <Input
-                id="street"
-                type="text"
+                id="firstName"
+                value={customerInfo.firstName}
+                onChange={(e) => handleInputChange('firstName', e.target.value)}
                 required
-                value={formData.street}
-                onChange={(e) => handleInputChange('street', e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="zipCode">Postleitzahl *</Label>
-                <Input
-                  id="zipCode"
-                  type="text"
-                  required
-                  value={formData.zipCode}
-                  onChange={(e) => handleInputChange('zipCode', e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="city">Stadt *</Label>
-                <Input
-                  id="city"
-                  type="text"
-                  required
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
-                />
-              </div>
+            <div>
+              <Label htmlFor="lastName">Nachname *</Label>
+              <Input
+                id="lastName"
+                value={customerInfo.lastName}
+                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="email">E-Mail *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={customerInfo.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="phone">Telefon</Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={customerInfo.phone}
+              onChange={(e) => handleInputChange('phone', e.target.value)}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="address">Adresse</Label>
+            <Input
+              id="address"
+              value={customerInfo.address}
+              onChange={(e) => handleInputChange('address', e.target.value)}
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="city">Stadt</Label>
+              <Input
+                id="city"
+                value={customerInfo.city}
+                onChange={(e) => handleInputChange('city', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="postalCode">PLZ</Label>
+              <Input
+                id="postalCode"
+                value={customerInfo.postalCode}
+                onChange={(e) => handleInputChange('postalCode', e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="country">Land</Label>
               <Input
                 id="country"
-                type="text"
-                value={formData.country}
+                value={customerInfo.country}
                 onChange={(e) => handleInputChange('country', e.target.value)}
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Bank Transfer Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Building2 className="h-5 w-5" />
-              <span>Bankverbindung für Überweisung</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Bank:</span>
-                <div className="flex items-center space-x-2">
-                  <span>{bankDetails.bankName}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => copyToClipboard(bankDetails.bankName, 'Bankname')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">IBAN:</span>
-                <div className="flex items-center space-x-2">
-                  <span className="font-mono">{bankDetails.iban}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => copyToClipboard(bankDetails.iban, 'IBAN')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">BIC/SWIFT:</span>
-                <div className="flex items-center space-x-2">
-                  <span className="font-mono">{bankDetails.bic}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => copyToClipboard(bankDetails.bic, 'BIC/SWIFT')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Empfänger:</span>
-                <div className="flex items-center space-x-2">
-                  <span>{bankDetails.accountHolder}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => copyToClipboard(bankDetails.accountHolder, 'Empfänger')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Type de transfert:</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-green-600 font-semibold">{bankDetails.transferType}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => copyToClipboard(bankDetails.transferType, 'Type de transfert')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Verwendungszweck:</span>
-                <div className="flex items-center space-x-2">
-                  <span className="font-mono text-luxury-gold">{bankDetails.reference}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => copyToClipboard(bankDetails.reference, 'Verwendungszweck')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-between items-center font-bold text-luxury-gold">
-                <span>Betrag:</span>
-                <span>€{depositAmount.toLocaleString()}</span>
-              </div>
+      {/* Payment Option */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Zahlungsart</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup value={paymentType} onValueChange={setPaymentType}>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="deposit" id="deposit" />
+              <Label htmlFor="deposit">
+                Anzahlung (20%) - €{depositAmount.toLocaleString()}
+              </Label>
             </div>
-            <div className="text-sm text-gray-600 space-y-2">
-              <p>• Bitte überweisen Sie den Anzahlungsbetrag und laden Sie anschließend den Nachweis hoch.</p>
-              <p>• Verwenden Sie unbedingt den angegebenen Verwendungszweck für eine schnelle Zuordnung.</p>
-              <p>• Mit einem instantanen Transfer wird Ihr Geld sofort übertragen.</p>
-              <p>• Nach Überprüfung des Zahlungsnachweises erhalten Sie eine Bestätigung.</p>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="full" id="full" />
+              <Label htmlFor="full">
+                Vollzahlung - €{totalAmount.toLocaleString()}
+              </Label>
             </div>
-          </CardContent>
-        </Card>
+          </RadioGroup>
+        </CardContent>
+      </Card>
 
-        {/* Payment Proof Upload */}
-        <PaymentProofUpload
-          onProofUploaded={handleProofUploaded}
-          uploadedFile={paymentProof}
-          onRemoveFile={handleRemoveProof}
-        />
+      {/* Bank Transfer Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Bankverbindung für Überweisung</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+            <div><strong>Name:</strong> Giampaolo Cristofori</div>
+            <div><strong>IBAN:</strong> IT50L3608105138218082418145</div>
+            <div><strong>BIC/SWIFT:</strong> PPAYITR1XXX</div>
+            <div><strong>Überweisungsart:</strong> Instantané</div>
+            <div><strong>Betrag:</strong> €{paymentAmount.toLocaleString()}</div>
+          </div>
+          <p className="text-sm text-gray-600">
+            Bitte verwenden Sie Ihren Namen als Verwendungszweck und laden Sie anschließend den Zahlungsnachweis hoch.
+          </p>
+        </CardContent>
+      </Card>
 
-        {/* Action Buttons */}
-        <div className="flex space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="flex-1"
-          >
-            Abbrechen
-          </Button>
-          <Button
-            type="submit"
-            disabled={!isFormValid()}
-            className={`flex-1 ${
-              isFormValid() 
-                ? 'bg-luxury-gold hover:bg-luxury-dark-gold text-black' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Bestellung mit Nachweis bestätigen
-          </Button>
-        </div>
-      </form>
+      {/* Payment Proof Upload */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Zahlungsnachweis hochladen</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PaymentProofUpload onFileSelect={setPaymentProof} />
+        </CardContent>
+      </Card>
 
-      <div className="text-xs text-gray-500 text-center space-y-1">
-        <p>🏦 Überweisen Sie die Anzahlung und laden Sie den Nachweis hoch</p>
-        <p>Ihre Bestellung wird erst nach Überprüfung des Zahlungsnachweises bestätigt</p>
+      {/* Special Requests */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Besondere Anfragen (Optional)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="Haben Sie besondere Wünsche oder Anmerkungen zu Ihrer Bestellung?"
+            value={specialRequests}
+            onChange={(e) => setSpecialRequests(e.target.value)}
+            rows={3}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Order Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Bestellübersicht</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Gesamtwert der Bestellung:</span>
+              <span className="font-semibold">€{totalAmount.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Zu zahlender Betrag ({paymentType === 'deposit' ? 'Anzahlung 20%' : 'Vollzahlung'}):</span>
+              <span className="font-bold text-luxury-gold">€{paymentAmount.toLocaleString()}</span>
+            </div>
+            {paymentType === 'deposit' && (
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Restbetrag (bei Lieferung):</span>
+                <span>€{(totalAmount - depositAmount).toLocaleString()}</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Action Buttons */}
+      <div className="flex space-x-4">
+        <Button variant="outline" onClick={onCancel} className="flex-1">
+          Abbrechen
+        </Button>
+        <Button 
+          onClick={handleSubmit}
+          className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black"
+        >
+          Bestellung abschicken
+        </Button>
       </div>
     </div>
   );
