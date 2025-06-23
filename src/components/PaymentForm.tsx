@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +10,6 @@ import { Separator } from '@/components/ui/separator';
 import PaymentProofUpload from './PaymentProofUpload';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
-import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentFormProps {
   totalAmount: number;
@@ -78,32 +78,111 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
       `${item.brand} ${item.model} (${item.year}) - Menge: ${item.quantity} - Preis: €${item.price.toLocaleString()}`
     ).join('\n');
 
-    // Send emails using Supabase Edge Function
+    const orderDate = new Date().toLocaleDateString('de-DE');
+    const orderTime = new Date().toLocaleTimeString('de-DE');
+
+    // Prepare business notification email
+    const businessEmailContent = `
+NEUE BESTELLUNG EINGEGANGEN
+
+Kundendaten:
+- Name: ${customerInfo.firstName} ${customerInfo.lastName}
+- E-Mail: ${customerInfo.email}
+- Telefon: ${customerInfo.phone}
+- Adresse: ${customerInfo.address}, ${customerInfo.city}, ${customerInfo.postalCode}, ${customerInfo.country}
+
+Bestelldetails:
+- Zahlungsart: ${paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung'}
+- Zu zahlender Betrag: €${paymentAmount.toLocaleString()}
+- Gesamtwert: €${totalAmount.toLocaleString()}
+
+Bestellte Fahrzeuge:
+${orderSummary}
+
+${specialRequests ? `Besondere Anfragen: ${specialRequests}` : 'Keine besonderen Anfragen'}
+
+Bestelldatum: ${orderDate} ${orderTime}
+    `;
+
+    // Prepare customer confirmation email
+    const customerEmailContent = `
+Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
+
+vielen Dank für Ihre Bestellung bei Auto Import Export!
+
+Ihre Bestelldetails:
+- Bestellwert: €${totalAmount.toLocaleString()}
+- Zahlungsart: ${paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung'}
+- Zu zahlender Betrag: €${paymentAmount.toLocaleString()}
+${paymentType === 'deposit' ? `- Restbetrag bei Lieferung: €${(totalAmount - depositAmount).toLocaleString()}` : ''}
+
+Bestellte Fahrzeuge:
+${orderSummary}
+
+${specialRequests ? `Besondere Anfragen: ${specialRequests}` : ''}
+
+Wir haben Ihre Zahlung erhalten und werden Ihre Bestellung umgehend bearbeiten. Sie erhalten in Kürze weitere Informationen zum Lieferstatus.
+
+Bei Fragen stehen wir Ihnen gerne zur Verfügung:
+- Telefon: +33774 072351
+- E-Mail: contact@autoimportexpor.com
+
+Vielen Dank für Ihr Vertrauen!
+
+Ihr Team von Auto Import Export
+Germendorfer Dorfstraße 66
+16515 Oranienburg, Deutschland
+    `;
+
     try {
-      const { data, error } = await supabase.functions.invoke('send-order-emails', {
-        body: {
-          customerInfo,
-          paymentType: paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung',
-          paymentAmount,
-          totalAmount,
-          depositAmount,
-          orderSummary,
-          specialRequests: specialRequests || 'Keine besonderen Anfragen'
-        }
+      // Send business notification email
+      const businessResponse = await fetch('https://formspree.io/f/xzzggyqk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'contact@autoimportexpor.com',
+          subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
+          message: businessEmailContent,
+          _replyto: customerInfo.email
+        }),
       });
 
-      if (error) {
-        console.error('Error sending emails:', error);
+      // Send customer confirmation email
+      const customerResponse = await fetch('https://formspree.io/f/xzzggyqk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: customerInfo.email,
+          subject: 'Bestellbestätigung - Auto Import Export',
+          message: customerEmailContent,
+          _replyto: 'contact@autoimportexpor.com'
+        }),
+      });
+
+      if (businessResponse.ok && customerResponse.ok) {
+        toast({
+          title: "E-Mails erfolgreich gesendet",
+          description: "Benachrichtigung an das Unternehmen und Bestätigung an den Kunden wurden versendet.",
+        });
+      } else {
+        console.error('Error sending emails:', { businessResponse, customerResponse });
         toast({
           title: "Warnung",
           description: "E-Mail-Versand fehlgeschlagen, aber Ihre Bestellung wurde registriert.",
           variant: "destructive",
         });
-      } else {
-        console.log('Emails sent successfully:', data);
       }
     } catch (error) {
-      console.error('Error calling email function:', error);
+      console.error('Error sending emails:', error);
+      toast({
+        title: "Warnung",
+        description: "E-Mail-Versand fehlgeschlagen, aber Ihre Bestellung wurde registriert.",
+        variant: "destructive",
+      });
     }
 
     // Call the onSubmit callback with all the data
