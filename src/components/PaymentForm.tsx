@@ -77,42 +77,8 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
       `${item.brand} ${item.model} (${item.year}) - Menge: ${item.quantity} - Preis: €${item.price.toLocaleString()}`
     ).join('\n');
 
-    // Send email notification to business
-    try {
-      const response = await fetch('https://formspree.io/f/xzzggyqk', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          _to: 'contact@autoimportexpor.com',
-          _subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
-          customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
-          customerEmail: customerInfo.email,
-          customerPhone: customerInfo.phone,
-          customerAddress: `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.postalCode}, ${customerInfo.country}`,
-          paymentType: paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung',
-          paymentAmount: `€${paymentAmount.toLocaleString()}`,
-          totalOrderValue: `€${totalAmount.toLocaleString()}`,
-          orderSummary: orderSummary,
-          specialRequests: specialRequests || 'Keine besonderen Anfragen',
-          orderDate: new Date().toLocaleDateString('de-DE'),
-          orderTime: new Date().toLocaleTimeString('de-DE')
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Order notification sent successfully');
-      } else {
-        console.error('Failed to send order notification');
-      }
-    } catch (error) {
-      console.error('Error sending order notification:', error);
-    }
-
-    // Send confirmation email to customer using the same Formspree endpoint
-    try {
-      const customerConfirmationMessage = `Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
+    // Prepare customer confirmation message
+    const customerConfirmationMessage = `Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
 
 vielen Dank für Ihre Bestellung bei Auto Import Export!
 
@@ -139,28 +105,39 @@ Ihr Team von Auto Import Export
 Germendorfer Dorfstraße 66
 16515 Oranienburg, Deutschland`;
 
-      const customerResponse = await fetch('https://formspree.io/f/myzjdajk', {
+    // Send email notification to business AND customer confirmation in one request
+    try {
+      const response = await fetch('https://formspree.io/f/xzzggyqk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          firstName: customerInfo.firstName,
-          lastName: customerInfo.lastName,
-          email: customerInfo.email,
-          subject: 'Bestellbestätigung - Auto Import Export',
-          message: customerConfirmationMessage,
-          _replyto: 'contact@autoimportexpor.com'
+          _to: 'contact@autoimportexpor.com',
+          _cc: customerInfo.email, // This will send a copy to the customer
+          _subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
+          customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+          customerEmail: customerInfo.email,
+          customerPhone: customerInfo.phone,
+          customerAddress: `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.postalCode}, ${customerInfo.country}`,
+          paymentType: paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung',
+          paymentAmount: `€${paymentAmount.toLocaleString()}`,
+          totalOrderValue: `€${totalAmount.toLocaleString()}`,
+          orderSummary: orderSummary,
+          specialRequests: specialRequests || 'Keine besonderen Anfragen',
+          orderDate: new Date().toLocaleDateString('de-DE'),
+          orderTime: new Date().toLocaleTimeString('de-DE'),
+          customerConfirmation: customerConfirmationMessage
         }),
       });
 
-      if (customerResponse.ok) {
-        console.log('Customer confirmation sent successfully');
+      if (response.ok) {
+        console.log('Order notification and customer confirmation sent successfully');
       } else {
-        console.error('Failed to send customer confirmation');
+        console.error('Failed to send order notification and customer confirmation');
       }
     } catch (error) {
-      console.error('Error sending customer confirmation:', error);
+      console.error('Error sending emails:', error);
     }
 
     // Call the onSubmit callback with all the data
