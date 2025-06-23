@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -80,7 +81,7 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
     const orderDate = new Date().toLocaleDateString('de-DE');
     const orderTime = new Date().toLocaleTimeString('de-DE');
 
-    // Prepare email content for business (main recipient)
+    // Prepare email content for business
     const businessEmailContent = `
 NEUE BESTELLUNG EINGEGANGEN
 
@@ -101,11 +102,10 @@ ${orderSummary}
 ${specialRequests ? `Besondere Anfragen: ${specialRequests}` : 'Keine besonderen Anfragen'}
 
 Bestelldatum: ${orderDate} ${orderTime}
+    `;
 
----
-
-KUNDENBESTÄTIGUNG (Diese Nachricht wurde auch an den Kunden gesendet):
-
+    // Prepare customer confirmation email
+    const customerEmailContent = `
 Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
 
 vielen Dank für Ihre Bestellung bei Auto Import Export!
@@ -135,39 +135,66 @@ Germendorfer Dorfstraße 66
     `;
 
     try {
-      // Send single email with CC to customer
-      const response = await fetch('https://formspree.io/f/xzzggyqk', {
+      // Send business notification email
+      const businessResponse = await fetch('https://formspree.io/f/xzzggyqk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email: 'contact@autoimportexpor.com',
-          _cc: customerInfo.email,
           subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
           message: businessEmailContent,
           _replyto: customerInfo.email
         }),
       });
 
-      if (response.ok) {
+      // Send customer confirmation email using a second endpoint
+      const customerResponse = await fetch('https://formspree.io/f/YOUR_CUSTOMER_ENDPOINT_ID', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: customerInfo.email,
+          subject: 'Bestellbestätigung - Auto Import Export',
+          message: customerEmailContent,
+          _replyto: 'contact@autoimportexpor.com'
+        }),
+      });
+
+      if (businessResponse.ok && customerResponse.ok) {
         toast({
-          title: "Bestellung erfolgreich eingereicht",
-          description: "E-Mail-Benachrichtigung wurde an das Unternehmen gesendet und Sie haben eine Kopie erhalten.",
+          title: "E-Mails erfolgreich gesendet",
+          description: "Benachrichtigung an das Unternehmen und Bestätigung an den Kunden wurden versendet.",
         });
-      } else {
-        console.error('Error sending email:', response);
+      } else if (businessResponse.ok && !customerResponse.ok) {
+        console.error('Error sending customer email:', customerResponse);
+        toast({
+          title: "Bestellung eingereicht",
+          description: "Bestellung wurde an das Unternehmen gesendet, aber die Kundenbestätigung konnte nicht versendet werden.",
+          variant: "destructive",
+        });
+      } else if (!businessResponse.ok && customerResponse.ok) {
+        console.error('Error sending business email:', businessResponse);
         toast({
           title: "Warnung",
-          description: "E-Mail-Versand fehlgeschlagen, aber Ihre Bestellung wurde registriert.",
+          description: "Kundenbestätigung wurde versendet, aber die Geschäftsbenachrichtigung fehlgeschlagen.",
+          variant: "destructive",
+        });
+      } else {
+        console.error('Error sending both emails:', { businessResponse, customerResponse });
+        toast({
+          title: "Fehler",
+          description: "E-Mail-Versand fehlgeschlagen. Bitte versuchen Sie es erneut.",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error sending email:', error);
+      console.error('Error sending emails:', error);
       toast({
-        title: "Warnung",
-        description: "E-Mail-Versand fehlgeschlagen, aber Ihre Bestellung wurde registriert.",
+        title: "Fehler",
+        description: "E-Mail-Versand fehlgeschlagen. Bitte versuchen Sie es erneut.",
         variant: "destructive",
       });
     }
