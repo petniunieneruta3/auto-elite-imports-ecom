@@ -110,21 +110,9 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
       console.error('Error sending order notification:', error);
     }
 
-    // Send confirmation email to customer
+    // Send confirmation email to customer using the same Formspree endpoint
     try {
-      const customerResponse = await fetch('https://formspree.io/f/myzjdajk', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          _to: customerInfo.email,
-          _subject: 'Bestellbestätigung - Auto Import Export',
-          firstName: customerInfo.firstName,
-          lastName: customerInfo.lastName,
-          email: customerInfo.email,
-          subject: 'Bestellbestätigung',
-          message: `Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
+      const customerConfirmationMessage = `Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
 
 vielen Dank für Ihre Bestellung bei Auto Import Export!
 
@@ -149,7 +137,19 @@ Vielen Dank für Ihr Vertrauen!
 
 Ihr Team von Auto Import Export
 Germendorfer Dorfstraße 66
-16515 Oranienburg, Deutschland`,
+16515 Oranienburg, Deutschland`;
+
+      const customerResponse = await fetch('https://formspree.io/f/myzjdajk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: customerInfo.firstName,
+          lastName: customerInfo.lastName,
+          email: customerInfo.email,
+          subject: 'Bestellbestätigung - Auto Import Export',
+          message: customerConfirmationMessage,
           _replyto: 'contact@autoimportexpor.com'
         }),
       });

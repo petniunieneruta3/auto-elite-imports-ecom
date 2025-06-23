@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import {
@@ -38,14 +39,16 @@ const CartDrawer = () => {
     console.log('Payment data:', paymentData);
     console.log('Payment proof file:', paymentData.paymentProof);
     
+    // Clear the cart immediately after successful submission
+    clearCart();
+    
     toast({
       title: "Bestellung eingereicht",
       description: `Ihre Bestellung über ${items.length} Artikel wurde eingereicht. Wir überprüfen Ihren Zahlungsnachweis und bestätigen Ihre Bestellung innerhalb von 24 Stunden.`,
       duration: 8000,
     });
     
-    // Keep the cart items until order is actually confirmed by admin
-    // Only clear the forms and close the drawer
+    // Close the payment form and drawer
     setShowPaymentForm(false);
     setIsOpen(false);
     
@@ -65,15 +68,6 @@ const CartDrawer = () => {
 
   const handleBackToCart = () => {
     setShowPaymentForm(false);
-  };
-
-  // Function to clear cart after successful order confirmation (would be called by admin system)
-  const handleOrderConfirmed = () => {
-    clearCart();
-    toast({
-      title: "Bestellung bestätigt",
-      description: "Ihre Bestellung wurde offiziell bestätigt. Vielen Dank für Ihr Vertrauen!",
-    });
   };
 
   return (
@@ -187,9 +181,6 @@ const CartDrawer = () => {
                 <div className="flex justify-between items-center text-sm text-gray-600">
                   <span>Erforderliche Anzahlung (20%):</span>
                   <span className="font-semibold">€{depositAmount.toLocaleString()}</span>
-                </div>
-                <div className="text-xs text-gray-500">
-                  <p>* Fahrzeuge bleiben im Warenkorb bis zur Bestätigung der Zahlung</p>
                 </div>
               </div>
               <div className="flex space-x-2">
