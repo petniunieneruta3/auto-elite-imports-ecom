@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,7 +80,7 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
     const orderDate = new Date().toLocaleDateString('de-DE');
     const orderTime = new Date().toLocaleTimeString('de-DE');
 
-    // Prepare business notification email
+    // Prepare email content for business (main recipient)
     const businessEmailContent = `
 NEUE BESTELLUNG EINGEGANGEN
 
@@ -102,10 +101,11 @@ ${orderSummary}
 ${specialRequests ? `Besondere Anfragen: ${specialRequests}` : 'Keine besonderen Anfragen'}
 
 Bestelldatum: ${orderDate} ${orderTime}
-    `;
 
-    // Prepare customer confirmation email
-    const customerEmailContent = `
+---
+
+KUNDENBESTÄTIGUNG (Diese Nachricht wurde auch an den Kunden gesendet):
+
 Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
 
 vielen Dank für Ihre Bestellung bei Auto Import Export!
@@ -135,41 +135,28 @@ Germendorfer Dorfstraße 66
     `;
 
     try {
-      // Send business notification email
-      const businessResponse = await fetch('https://formspree.io/f/xzzggyqk', {
+      // Send single email with CC to customer
+      const response = await fetch('https://formspree.io/f/xzzggyqk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email: 'contact@autoimportexpor.com',
+          _cc: customerInfo.email,
           subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
           message: businessEmailContent,
           _replyto: customerInfo.email
         }),
       });
 
-      // Send customer confirmation email
-      const customerResponse = await fetch('https://formspree.io/f/xzzggyqk', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: customerInfo.email,
-          subject: 'Bestellbestätigung - Auto Import Export',
-          message: customerEmailContent,
-          _replyto: 'contact@autoimportexpor.com'
-        }),
-      });
-
-      if (businessResponse.ok && customerResponse.ok) {
+      if (response.ok) {
         toast({
-          title: "E-Mails erfolgreich gesendet",
-          description: "Benachrichtigung an das Unternehmen und Bestätigung an den Kunden wurden versendet.",
+          title: "Bestellung erfolgreich eingereicht",
+          description: "E-Mail-Benachrichtigung wurde an das Unternehmen gesendet und Sie haben eine Kopie erhalten.",
         });
       } else {
-        console.error('Error sending emails:', { businessResponse, customerResponse });
+        console.error('Error sending email:', response);
         toast({
           title: "Warnung",
           description: "E-Mail-Versand fehlgeschlagen, aber Ihre Bestellung wurde registriert.",
@@ -177,7 +164,7 @@ Germendorfer Dorfstraße 66
         });
       }
     } catch (error) {
-      console.error('Error sending emails:', error);
+      console.error('Error sending email:', error);
       toast({
         title: "Warnung",
         description: "E-Mail-Versand fehlgeschlagen, aber Ihre Bestellung wurde registriert.",
