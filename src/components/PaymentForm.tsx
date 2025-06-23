@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import PaymentProofUpload from './PaymentProofUpload';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentFormProps {
   totalAmount: number;
@@ -77,67 +78,32 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
       `${item.brand} ${item.model} (${item.year}) - Menge: ${item.quantity} - Preis: €${item.price.toLocaleString()}`
     ).join('\n');
 
-    // Prepare customer confirmation message
-    const customerConfirmationMessage = `Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
-
-vielen Dank für Ihre Bestellung bei Auto Import Export!
-
-Ihre Bestelldetails:
-- Bestellwert: €${totalAmount.toLocaleString()}
-- Zahlungsart: ${paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung'}
-- Zu zahlender Betrag: €${paymentAmount.toLocaleString()}
-${paymentType === 'deposit' ? `- Restbetrag bei Lieferung: €${(totalAmount - depositAmount).toLocaleString()}` : ''}
-
-Bestellte Fahrzeuge:
-${orderSummary}
-
-${specialRequests ? `Besondere Anfragen: ${specialRequests}` : ''}
-
-Wir haben Ihre Zahlung erhalten und werden Ihre Bestellung umgehend bearbeiten. Sie erhalten in Kürze weitere Informationen zum Lieferstatus.
-
-Bei Fragen stehen wir Ihnen gerne zur Verfügung:
-- Telefon: +33774 072351
-- E-Mail: contact@autoimportexpor.com
-
-Vielen Dank für Ihr Vertrauen!
-
-Ihr Team von Auto Import Export
-Germendorfer Dorfstraße 66
-16515 Oranienburg, Deutschland`;
-
-    // Send email notification to business AND customer confirmation in one request
+    // Send emails using Supabase Edge Function
     try {
-      const response = await fetch('https://formspree.io/f/xzzggyqk', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          _to: 'contact@autoimportexpor.com',
-          _cc: customerInfo.email, // This will send a copy to the customer
-          _subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
-          customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
-          customerEmail: customerInfo.email,
-          customerPhone: customerInfo.phone,
-          customerAddress: `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.postalCode}, ${customerInfo.country}`,
+      const { data, error } = await supabase.functions.invoke('send-order-emails', {
+        body: {
+          customerInfo,
           paymentType: paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung',
-          paymentAmount: `€${paymentAmount.toLocaleString()}`,
-          totalOrderValue: `€${totalAmount.toLocaleString()}`,
-          orderSummary: orderSummary,
-          specialRequests: specialRequests || 'Keine besonderen Anfragen',
-          orderDate: new Date().toLocaleDateString('de-DE'),
-          orderTime: new Date().toLocaleTimeString('de-DE'),
-          customerConfirmation: customerConfirmationMessage
-        }),
+          paymentAmount,
+          totalAmount,
+          depositAmount,
+          orderSummary,
+          specialRequests: specialRequests || 'Keine besonderen Anfragen'
+        }
       });
 
-      if (response.ok) {
-        console.log('Order notification and customer confirmation sent successfully');
+      if (error) {
+        console.error('Error sending emails:', error);
+        toast({
+          title: "Warnung",
+          description: "E-Mail-Versand fehlgeschlagen, aber Ihre Bestellung wurde registriert.",
+          variant: "destructive",
+        });
       } else {
-        console.error('Failed to send order notification and customer confirmation');
+        console.log('Emails sent successfully:', data);
       }
     } catch (error) {
-      console.error('Error sending emails:', error);
+      console.error('Error calling email function:', error);
     }
 
     // Call the onSubmit callback with all the data
