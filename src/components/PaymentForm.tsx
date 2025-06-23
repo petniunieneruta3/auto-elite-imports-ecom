@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -109,6 +108,59 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
       }
     } catch (error) {
       console.error('Error sending order notification:', error);
+    }
+
+    // Send confirmation email to customer
+    try {
+      const customerResponse = await fetch('https://formspree.io/f/myzjdajk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          _to: customerInfo.email,
+          _subject: 'Bestellbestätigung - Auto Import Export',
+          firstName: customerInfo.firstName,
+          lastName: customerInfo.lastName,
+          email: customerInfo.email,
+          subject: 'Bestellbestätigung',
+          message: `Liebe/r ${customerInfo.firstName} ${customerInfo.lastName},
+
+vielen Dank für Ihre Bestellung bei Auto Import Export!
+
+Ihre Bestelldetails:
+- Bestellwert: €${totalAmount.toLocaleString()}
+- Zahlungsart: ${paymentType === 'deposit' ? 'Anzahlung (20%)' : 'Vollzahlung'}
+- Zu zahlender Betrag: €${paymentAmount.toLocaleString()}
+${paymentType === 'deposit' ? `- Restbetrag bei Lieferung: €${(totalAmount - depositAmount).toLocaleString()}` : ''}
+
+Bestellte Fahrzeuge:
+${orderSummary}
+
+${specialRequests ? `Besondere Anfragen: ${specialRequests}` : ''}
+
+Wir haben Ihre Zahlung erhalten und werden Ihre Bestellung umgehend bearbeiten. Sie erhalten in Kürze weitere Informationen zum Lieferstatus.
+
+Bei Fragen stehen wir Ihnen gerne zur Verfügung:
+- Telefon: +33774 072351
+- E-Mail: contact@autoimportexpor.com
+
+Vielen Dank für Ihr Vertrauen!
+
+Ihr Team von Auto Import Export
+Germendorfer Dorfstraße 66
+16515 Oranienburg, Deutschland`,
+          _replyto: 'contact@autoimportexpor.com'
+        }),
+      });
+
+      if (customerResponse.ok) {
+        console.log('Customer confirmation sent successfully');
+      } else {
+        console.error('Failed to send customer confirmation');
+      }
+    } catch (error) {
+      console.error('Error sending customer confirmation:', error);
     }
 
     // Call the onSubmit callback with all the data
