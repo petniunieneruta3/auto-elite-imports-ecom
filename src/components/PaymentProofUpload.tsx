@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,12 +20,17 @@ const PaymentProofUpload: React.FC<PaymentProofUploadProps> = ({
 }) => {
   const { toast } = useToast();
   const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       validateAndUpload(file);
     }
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
   };
 
   const validateAndUpload = (file: File) => {
@@ -101,7 +106,7 @@ const PaymentProofUpload: React.FC<PaymentProofUploadProps> = ({
 
         {!uploadedFile ? (
           <div
-            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
               isDragOver 
                 ? 'border-luxury-gold bg-luxury-gold/5' 
                 : 'border-gray-300 hover:border-gray-400'
@@ -109,23 +114,22 @@ const PaymentProofUpload: React.FC<PaymentProofUploadProps> = ({
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
+            onClick={handleButtonClick}
           >
             <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
             <p className="text-sm text-gray-600 mb-2">
               Datei hierher ziehen oder klicken zum Auswählen
             </p>
-            <Label htmlFor="proof-upload" className="cursor-pointer">
-              <Button type="button" variant="outline" className="mt-2">
-                Datei auswählen
-              </Button>
-              <Input
-                id="proof-upload"
-                type="file"
-                accept="image/*,.pdf"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </Label>
+            <Button type="button" variant="outline" className="mt-2">
+              Datei auswählen
+            </Button>
+            <Input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf"
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </div>
         ) : (
           <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
