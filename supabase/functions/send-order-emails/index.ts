@@ -27,6 +27,9 @@ interface OrderEmailRequest {
   depositAmount: number;
   orderSummary: string;
   specialRequests: string;
+  paymentProofUrl?: string;
+  paymentProofFilename?: string;
+  orderId?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -43,7 +46,10 @@ const handler = async (req: Request): Promise<Response> => {
       totalAmount,
       depositAmount,
       orderSummary,
-      specialRequests
+      specialRequests,
+      paymentProofUrl,
+      paymentProofFilename,
+      orderId
     }: OrderEmailRequest = await req.json();
 
     const orderDate = new Date().toLocaleDateString('de-DE');
@@ -56,6 +62,8 @@ const handler = async (req: Request): Promise<Response> => {
       subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
       html: `
         <h2>Neue Bestellung eingegangen</h2>
+        <p><strong>Bestell-ID:</strong> ${orderId || 'N/A'}</p>
+        
         <h3>Kundendaten:</h3>
         <p><strong>Name:</strong> ${customerInfo.firstName} ${customerInfo.lastName}</p>
         <p><strong>E-Mail:</strong> ${customerInfo.email}</p>
@@ -72,7 +80,19 @@ const handler = async (req: Request): Promise<Response> => {
         
         ${specialRequests ? `<h3>Besondere Anfragen:</h3><p>${specialRequests}</p>` : ''}
         
+        ${paymentProofUrl ? `
+        <h3>Zahlungsnachweis:</h3>
+        <p><strong>Dateiname:</strong> ${paymentProofFilename || 'Unbekannt'}</p>
+        <p><a href="${paymentProofUrl}" target="_blank" style="color: #2754C5; text-decoration: underline;">📎 Zahlungsnachweis anzeigen</a></p>
+        <p><em>Klicken Sie auf den Link oben, um die vom Kunden hochgeladene Zahlungsbestätigung anzuzeigen.</em></p>
+        ` : ''}
+        
         <p><strong>Bestelldatum:</strong> ${orderDate} ${orderTime}</p>
+        
+        <hr style="margin: 20px 0;">
+        <p style="font-size: 12px; color: #666;">
+          Diese E-Mail wurde automatisch vom Auto Import Export Bestellsystem generiert.
+        </p>
       `,
     });
 
@@ -87,6 +107,8 @@ const handler = async (req: Request): Promise<Response> => {
         
         <p>vielen Dank für Ihre Bestellung bei Auto Import Export!</p>
         
+        ${orderId ? `<p><strong>Ihre Bestell-ID:</strong> ${orderId}</p>` : ''}
+        
         <h2>Ihre Bestelldetails:</h2>
         <ul>
           <li><strong>Bestellwert:</strong> €${totalAmount.toLocaleString()}</li>
@@ -99,6 +121,12 @@ const handler = async (req: Request): Promise<Response> => {
         <pre>${orderSummary}</pre>
         
         ${specialRequests ? `<h2>Besondere Anfragen:</h2><p>${specialRequests}</p>` : ''}
+        
+        ${paymentProofUrl ? `
+        <h2>Ihr Zahlungsnachweis:</h2>
+        <p>✅ Zahlungsnachweis erfolgreich hochgeladen: ${paymentProofFilename || 'Datei'}</p>
+        <p>Wir haben Ihren Zahlungsnachweis erhalten und werden diesen umgehend prüfen.</p>
+        ` : ''}
         
         <p>Wir haben Ihre Zahlung erhalten und werden Ihre Bestellung umgehend bearbeiten. Sie erhalten in Kürze weitere Informationen zum Lieferstatus.</p>
         
@@ -113,6 +141,11 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Ihr Team von Auto Import Export</strong><br>
         Germendorfer Dorfstraße 66<br>
         16515 Oranienburg, Deutschland</p>
+        
+        <hr style="margin: 20px 0;">
+        <p style="font-size: 12px; color: #666;">
+          Diese E-Mail wurde automatisch generiert. Bitte antworten Sie nicht direkt auf diese E-Mail.
+        </p>
       `,
     });
 

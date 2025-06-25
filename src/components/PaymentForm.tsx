@@ -32,6 +32,7 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
   });
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [specialRequests, setSpecialRequests] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { items } = useCart();
 
@@ -50,8 +51,36 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
     setPaymentProof(null);
   };
 
+  const uploadPaymentProof = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('payment-proofs')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Error uploading file:', uploadError);
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('payment-proofs')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error in uploadPaymentProof:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
     
     if (!customerInfo.firstName || !customerInfo.lastName || !customerInfo.email) {
       toast({
@@ -71,14 +100,54 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
       return;
     }
 
-    const paymentAmount = paymentType === 'deposit' ? depositAmount : totalAmount;
-    
-    // Prepare order summary
-    const orderSummary = items.map(item => 
-      `${item.brand} ${item.model} (${item.year}) - Menge: ${item.quantity} - Preis: €${item.price.toLocaleString()}`
-    ).join('\n');
+    setIsSubmitting(true);
 
     try {
+      // Upload payment proof to Supabase Storage
+      const paymentProofUrl = await uploadPaymentProof(paymentProof);
+      
+      if (!paymentProofUrl) {
+        toast({
+          title: "Fehler",
+          description: "Fehler beim Upload der Zahlungsnachweis. Bitte versuchen Sie es erneut.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const paymentAmount = paymentType === 'deposit' ? depositAmount : totalAmount;
+      
+      // Prepare order summary
+      const orderSummary = items.map(item => 
+        `${item.brand} ${item.model} (${item.year}) - Menge: ${item.quantity} - Preis: €${item.price.toLocaleString()}`
+      ).join('\n');
+
+      // Save order to database
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_info: customerInfo,
+          payment_type: paymentType,
+          payment_amount: paymentAmount,
+          total_amount: totalAmount,
+          order_summary: orderSummary,
+          special_requests: specialRequests || null,
+          payment_proof_url: paymentProofUrl,
+          payment_proof_filename: paymentProof.name
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        console.error('Error saving order:', orderError);
+        toast({
+          title: "Fehler",
+          description: "Fehler beim Speichern der Bestellung. Bitte versuchen Sie es erneut.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Send emails using Supabase Edge Function with Resend
       const { data, error } = await supabase.functions.invoke('send-order-emails', {
         body: {
@@ -88,7 +157,10 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
           totalAmount,
           depositAmount,
           orderSummary,
-          specialRequests
+          specialRequests,
+          paymentProofUrl,
+          paymentProofFilename: paymentProof.name,
+          orderId: orderData.id
         }
       });
 
@@ -96,15 +168,15 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
         console.error('Error sending emails:', error);
         toast({
           title: "Fehler",
-          description: "E-Mail-Versand fehlgeschlagen. Bitte versuchen Sie es erneut.",
+          description: "E-Mail-Versand fehlgeschlagen. Die Bestellung wurde jedoch gespeichert.",
           variant: "destructive",
         });
         return;
       }
 
       toast({
-        title: "E-Mails erfolgreich gesendet",
-        description: "Benachrichtigung an das Unternehmen und Bestätigung an den Kunden wurden versendet.",
+        title: "Bestellung erfolgreich übermittelt",
+        description: "E-Mails wurden versendet und die Bestellung wurde gespeichert.",
       });
 
       // Call the onSubmit callback with all the data
@@ -114,18 +186,22 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
         paymentAmount,
         totalAmount,
         paymentProof,
+        paymentProofUrl,
         specialRequests,
         items,
-        orderSummary
+        orderSummary,
+        orderId: orderData.id
       });
 
     } catch (error) {
-      console.error('Error sending emails:', error);
+      console.error('Error submitting order:', error);
       toast({
         title: "Fehler",
-        description: "E-Mail-Versand fehlgeschlagen. Bitte versuchen Sie es erneut.",
+        description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -310,14 +386,15 @@ const PaymentForm = ({ totalAmount, depositAmount, onSubmit, onCancel }: Payment
 
       {/* Action Buttons */}
       <div className="flex space-x-4">
-        <Button variant="outline" onClick={onCancel} className="flex-1">
+        <Button variant="outline" onClick={onCancel} className="flex-1" disabled={isSubmitting}>
           Abbrechen
         </Button>
         <Button 
           onClick={handleSubmit}
           className="flex-1 bg-luxury-gold hover:bg-luxury-dark-gold text-black"
+          disabled={isSubmitting}
         >
-          Bestellung abschicken
+          {isSubmitting ? 'Wird verarbeitet...' : 'Bestellung abschicken'}
         </Button>
       </div>
     </div>
