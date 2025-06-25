@@ -39,6 +39,8 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("Starting email sending process...");
+    
     const {
       customerInfo,
       paymentType,
@@ -52,13 +54,22 @@ const handler = async (req: Request): Promise<Response> => {
       orderId
     }: OrderEmailRequest = await req.json();
 
+    console.log("Request data received:", {
+      customerEmail: customerInfo.email,
+      orderId,
+      paymentType,
+      paymentAmount
+    });
+
     const orderDate = new Date().toLocaleDateString('de-DE');
     const orderTime = new Date().toLocaleTimeString('de-DE');
 
+    console.log("Attempting to send business notification email...");
+    
     // Send business notification email
     const businessEmailResponse = await resend.emails.send({
       from: "Auto Import Export <noreply@autoimportexpor.com>",
-      to: ["petniunieneruta3@gmail.com"],
+      to: ["contact@autoimportexpor.com"],
       subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
       html: `
         <h2>Neue Bestellung eingegangen</h2>
@@ -95,6 +106,15 @@ const handler = async (req: Request): Promise<Response> => {
         </p>
       `,
     });
+
+    console.log('Business email response:', businessEmailResponse);
+
+    if (businessEmailResponse.error) {
+      console.error('Business email error:', businessEmailResponse.error);
+      throw new Error(`Business email failed: ${businessEmailResponse.error.message}`);
+    }
+
+    console.log("Attempting to send customer confirmation email...");
 
     // Send customer confirmation email
     const customerEmailResponse = await resend.emails.send({
@@ -149,13 +169,20 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log('Business email sent:', businessEmailResponse);
-    console.log('Customer email sent:', customerEmailResponse);
+    console.log('Customer email response:', customerEmailResponse);
+
+    if (customerEmailResponse.error) {
+      console.error('Customer email error:', customerEmailResponse.error);
+      throw new Error(`Customer email failed: ${customerEmailResponse.error.message}`);
+    }
+
+    console.log('Both emails sent successfully!');
 
     return new Response(JSON.stringify({ 
       success: true,
       businessEmailId: businessEmailResponse.data?.id,
-      customerEmailId: customerEmailResponse.data?.id
+      customerEmailId: customerEmailResponse.data?.id,
+      message: "Emails sent successfully"
     }), {
       status: 200,
       headers: {
@@ -165,8 +192,17 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error in send-order-emails function:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause
+    });
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: "Check function logs for more information"
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
