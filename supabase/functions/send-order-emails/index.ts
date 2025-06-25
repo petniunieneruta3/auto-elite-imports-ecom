@@ -58,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send business notification email
     const businessEmailResponse = await resend.emails.send({
       from: "Auto Import Export <noreply@autoimportexpor.com>",
-      to: ["contact@autoimportexpor.com"],
+      to: ["petniunieneruta3@gmail.com"],
       subject: `Neue Bestellung - ${customerInfo.firstName} ${customerInfo.lastName}`,
       html: `
         <h2>Neue Bestellung eingegangen</h2>
